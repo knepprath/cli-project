@@ -8,6 +8,7 @@ install:
 script:
   - poetry build
   - poetry config repositories.testpypi https://test.pypi.org/legacy/
+  - echo $PYPI_USER
 deploy:
   - provider: script
     skip_cleanup: true
