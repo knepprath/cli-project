@@ -1,18 +1,16 @@
 language: python
 dist: xenial
 before_install:
-  - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py > /tmp/get-poetry.py
-  - python /tmp/get-poetry.py -y --version 1.0.10
-  - export PATH=$HOME/.poetry/bin:$PATH
+  - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+  - source $HOME/.poetry/env
 install:
   - poetry install
 script:
   - poetry build
-  - poetry config repositories.testpypi https://test.pypi.org/legacy/
 deploy:
   - provider: script
     skip_cleanup: true
-    script: poetry publish
+    script: poetry publish --username $PYPI_USER --password $PYPI_PASS
     on:
       branch: master
       python: '3.6'
