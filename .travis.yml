@@ -8,11 +8,11 @@ install:
 script:
   - poetry build
   - poetry config repositories.testpypi https://test.pypi.org/legacy/
-  - echo $PYPI_USER
+  - poetry config http-basic.foo $PYPI_USER $PYPI_PASS
 deploy:
   - provider: script
     skip_cleanup: true
-    script: poetry publish --username $PYPI_USER --password $PYPI_PASS
+    script: poetry publish
     on:
       branch: master
       python: '3.6'
