@@ -12,7 +12,7 @@ script:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: poetry publish --username $PYPI_USER --password $PYPI_PASS
+    script: poetry publish --username=$PYPI_USER --password=$PYPI_PASS
     on:
       branch: master
       python: '3.6'
