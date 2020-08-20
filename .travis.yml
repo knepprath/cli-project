@@ -7,12 +7,13 @@ install:
   - poetry install
 script:
   - poetry build
-  - poetry config http-basic.pypi $PYPI_USERNAME $PYPI_PASSWORD
+  - poetry config repositories.testpypi https://test.pypi.org/legacy/
+  - poetry config http-basic.testpypi $TEST_PYPI_USERNAME $TEST_PYPI_PASSWORD
 deploy:
   - provider: script
     skip_cleanup: true
-    script: poetry publish
+    script: poetry publish -r testpypi
     on:
       branch: master
       python: '3.6'
-      tags: true
+#      tags: true
