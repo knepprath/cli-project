@@ -2,7 +2,7 @@
 *NOTE:* This project is a CLI built for educational purposes. 
 
 ## Testing
-To run unit tests `python3 -m unittest tests/test_cli_project.py`
+To run unit tests `python -m unittest discover -b`
 
 To execute integration tests run `behave`
 
