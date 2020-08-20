@@ -16,8 +16,6 @@ install:
 jobs:
   include:
     - stage: Quality
-    - name: type
-      script: make type
     - name: tests
       script: make test
     - name: integration
