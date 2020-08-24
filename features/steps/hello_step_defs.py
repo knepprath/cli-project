@@ -1,12 +1,17 @@
+import sys
 from behave import *
-from klick_brick_cli.klickbrick import parse_args
+from klick_brick_cli import klickbrick
 
 @given('we run the hello command')
 def step_impl(context):
-    context.cli = parse_args(['hello', '--name', 'david'])
+    args = ['hello', '--name', 'david']
+    old_sys_argv = sys.argv
+    sys.argv = [old_sys_argv[0]] + args
+
+    klickbrick.KlickBrick()
 
 @then('the command returns "hello world"')
 def step_impl(context):
-    args = context.cli
-    assert args.hello == 'hello'
-    assert args.name == 'david'
+    output = sys.stdout.getvalue().strip() # because stdout is a StringIO instance
+    assert output == "Hello david"
+    print(output)

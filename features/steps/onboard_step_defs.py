@@ -1,5 +1,4 @@
 from behave import *
-from klick_brick_cli.klickbrick import parse_args
 
 @when(u'the user runs `KlickBrick onboard --checklist`')
 def step_impl(context):

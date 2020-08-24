@@ -1,27 +1,39 @@
 import argparse
 import sys
 
-def parse_args(args):
-    parser = argparse.ArgumentParser()
+class KlickBrick(object):
 
-    parser.add_argument('hello',
-                        type=str,
-                        help="Friendly command that says hello")
-    parser.add_argument('--name',
-                        '-n',
-                        type=str,
-                        default="world",
-                        help="Optional flag to be more personal")
-    return parser.parse_args(args)
+    def __init__(self):
+        parser = argparse.ArgumentParser(prog='klickbrick')
+        parser.add_argument('command')
 
-def construct_greeting(message, name):
-    return f"{message} {name}"
+        args = parser.parse_args(sys.argv[1:2])
+        if not hasattr(self, args.command):
+            print('Unrecognized command')
+            parser.print_help()
+            exit(1)
+        # use dispatch pattern to invoke method with same name
+        getattr(self, args.command)()
 
-def main():
-    args = parse_args(sys.argv[1:])
+    def hello(self):
+        parser = argparse.ArgumentParser(
+            description='Record changes to the repository')
+        parser.add_argument('--name',
+                            '-n',
+                            type=str,
+                            default="world",
+                            help="Optional flag to be more personal")
 
-    if args.hello == "hello":
-        print(construct_greeting(args.hello, args.name))
+        args = parser.parse_args(sys.argv[2:])
+        print(construct_greeting(args.name))
+
+    def onboard(self):
+        print("creating checklist")
+
+
+def construct_greeting(name):
+    return f"Hello {name}"
+
 
 if __name__ == '__main__':
-    main()
+    KlickBrick()

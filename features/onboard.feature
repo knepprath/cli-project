@@ -1,3 +1,4 @@
+@skip
 Feature: Automate the onboarding workflow for new developers
 
   Scenario: New Developer Checklist
