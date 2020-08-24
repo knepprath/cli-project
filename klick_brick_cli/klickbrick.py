@@ -42,7 +42,7 @@ class KlickBrick(object):
         if args.checklist is True:
             print("creating checklist")
         # All other options require additional flags
-        elif hasattr(args, 'first_name') and hasattr(args, "last_name"):
+        elif args.first_name is not None and args.last_name is not None:
             if args.it_request is True:
                 print("submitting it request")
             elif args.dev_tools is True:
