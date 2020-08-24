@@ -1,13 +1,13 @@
 import unittest
-from cli_project import klick_brick_cli
+from klick_brick_cli import klickbrick
 
 class TestCLI(unittest.TestCase):
 
     def test_construct_greeting(self):
-        assert klick_brick_cli.construct_greeting("hello", "david") == "hello david"
+        assert klickbrick.construct_greeting("hello", "david") == "hello david"
 
     def test_parse_args(self):
-        args = klick_brick_cli.parse_args(['hello', '--name', 'david'])
+        args = klickbrick.parse_args(['hello', '--name', 'david'])
         assert args.hello == 'hello'
         assert args.name == 'david'
 

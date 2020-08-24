@@ -2,7 +2,7 @@
 name = "cli-project"
 version = "0.1.5"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["David Knepprath <david.knepprath@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"

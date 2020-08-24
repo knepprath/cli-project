@@ -1,5 +1,5 @@
 from behave import *
-from cli_project.klick_brick_cli import parse_args
+from klick_brick_cli.klickbrick import parse_args
 
 @given('we run the hello command')
 def step_impl(context):
