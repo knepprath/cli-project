@@ -28,7 +28,29 @@ class KlickBrick(object):
         print(construct_greeting(args.name))
 
     def onboard(self):
-        print("creating checklist")
+        parser = argparse.ArgumentParser(
+            description='Record changes to the repository')
+        parser.add_argument('--checklist', action='store_true')
+        parser.add_argument('--it-request', action='store_true')
+        parser.add_argument('--dev-tools', action='store_true')
+
+        parser.add_argument('--first-name')
+        parser.add_argument('--last-name')
+
+        args = parser.parse_args(sys.argv[2:])
+
+        if args.checklist is True:
+            print("creating checklist")
+        # All other options require additional flags
+        elif hasattr(args, 'first_name') and hasattr(args, "last_name"):
+            if args.it_request is True:
+                print("submitting it request")
+            elif args.dev_tools is True:
+                print("installing dev tools")
+            else:
+                print("creating checklist, submitting it request, and installing dev tools")
+        else:
+            print("missing required args")
 
 
 def construct_greeting(name):

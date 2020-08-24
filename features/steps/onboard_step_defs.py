@@ -2,9 +2,9 @@ import sys
 from behave import *
 from klick_brick_cli import klickbrick
 
-@when(u'the user runs `KlickBrick onboard --checklist`')
-def step_impl(context):
-    args = ['onboard', '--checklist']
+@when(u'the user runs KlickBrick "{command}"')
+def step_impl(context, command):
+    args = command.split()
     old_sys_argv = sys.argv
     sys.argv = [old_sys_argv[0]] + args
 
