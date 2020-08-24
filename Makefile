@@ -1,5 +1,5 @@
 test:
-	python -m unittest discover -b
+	python -m unittest
 
 integration:
 	behave
