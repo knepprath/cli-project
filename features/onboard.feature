@@ -10,6 +10,7 @@ Feature: Automate the onboarding workflow for new developers
     Then the email template is updated with the users name
 #    And the email client is successfully invoked
 
+  @use.with_os=darwin
   Scenario: New Developer Tools Installation - git
     When the user runs KlickBrick 'onboard --dev-tools --first-name "Ole Kirk" --last-name Christiansen'
     Then git is installed
