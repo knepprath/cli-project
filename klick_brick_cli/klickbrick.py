@@ -1,5 +1,7 @@
 import argparse
 import sys
+import os
+import shutil
 
 class KlickBrick(object):
 
@@ -41,6 +43,7 @@ class KlickBrick(object):
 
         if args.checklist is True:
             print("creating checklist")
+            write_checklist()
         # All other options require additional flags
         elif args.first_name is not None and args.last_name is not None:
             if args.it_request is True:
@@ -55,6 +58,10 @@ class KlickBrick(object):
 
 def construct_greeting(name):
     return f"Hello {name}"
+
+
+def write_checklist():
+    shutil.copyfile(os.path.abspath(f'{os.path.dirname(os.path.abspath(__file__))}/resources/onboard_checklist_template.md'), f"{os.getcwd()}/onboarding_checklist.md")
 
 
 if __name__ == '__main__':

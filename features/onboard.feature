@@ -3,7 +3,7 @@ Feature: Automate the onboarding workflow for new developers
   Scenario: New Developer Checklist
     When the user runs KlickBrick "onboard --checklist"
     Then an onboarding checklist is generated
-#    And the checklist is in Markdown format
+    And the checklist is in Markdown format
 
   @skip
   Scenario: New Developer IT Onboarding Request

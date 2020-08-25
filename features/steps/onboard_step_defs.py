@@ -1,4 +1,5 @@
 import sys
+import os
 from behave import *
 from klick_brick_cli import klickbrick
 
@@ -8,7 +9,7 @@ def step_impl(context, command):
     old_sys_argv = sys.argv
     sys.argv = [old_sys_argv[0]] + args
 
-    klickbrick.KlickBrick()
+    klickbrick.KlickBrick() # TODO evaluate how to invoke more realistically to a pip install of the module, but in environment that can be cleaned up
 
 @then(u'an onboarding checklist is generated')
 def step_impl(context):
@@ -18,4 +19,4 @@ def step_impl(context):
 
 @then(u'the checklist is in Markdown format')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then the checklist is in Markdown format')
+    assert os.path.isfile('onboarding_checklist.md')
