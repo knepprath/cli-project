@@ -1,15 +1,15 @@
 Feature: Automate the onboarding workflow for new developers
 
+  @skip
   Scenario: New Developer Checklist
-    When the user runs KlickBrick "onboard --checklist"
+    When the user runs KlickBrick 'onboard --checklist'
     Then an onboarding checklist is generated
     And the checklist is in Markdown format
 
-  @skip
   Scenario: New Developer IT Onboarding Request
-    When the user runs `KlickBrick onboard --it-request --first-name Ole Kirk --last-name Christiansen`
+    When the user runs KlickBrick 'onboard --it-request --first-name "Ole Kirk" --last-name Christiansen'
     Then the email template is updated with the users name
-    And the email client is successfully invoked
+#    And the email client is successfully invoked
 
   @skip
   Scenario: New Developer Tools Installation - git

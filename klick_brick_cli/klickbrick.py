@@ -2,6 +2,9 @@ import argparse
 import sys
 import os
 import shutil
+import subprocess
+
+# TODO add proper logger
 
 class KlickBrick(object):
 
@@ -48,6 +51,7 @@ class KlickBrick(object):
         elif args.first_name is not None and args.last_name is not None:
             if args.it_request is True:
                 print("submitting it request")
+                send_it_email(args.first_name, args.last_name)
             elif args.dev_tools is True:
                 print("installing dev tools")
             else:
@@ -63,6 +67,21 @@ def construct_greeting(name):
 def write_checklist():
     shutil.copyfile(f"{os.path.dirname(os.path.abspath(__file__))}/resources/onboard_checklist_template.md", f"{os.getcwd()}/onboarding_checklist.md")
     # shutil.copyfile(os.path.abspath('klick_brick_cli/resources/onboard_checklist_template.md'), f"{os.getcwd()}/onboarding_checklist.md")
+
+
+def send_it_email(first_name, last_name):
+    address = "it@example.com"
+    subject = "subject of email"
+
+    body = f"The user {first_name} {last_name} is being onboarded"
+    print(body)
+
+    url = "mailto:{}?subject={}&body={}"
+    url = url.format(address, subject, body)
+
+    # TODO put this in a try and assert that exception is not thrown
+    if sys.platform=='darwin':
+        subprocess.Popen(['open', url])
 
 
 if __name__ == '__main__':
