@@ -1,6 +1,5 @@
 Feature: Automate the onboarding workflow for new developers
 
-  @skip
   Scenario: New Developer Checklist
     When the user runs KlickBrick 'onboard --checklist'
     Then an onboarding checklist is generated
