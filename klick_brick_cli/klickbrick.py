@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 
+# TODO optimize imports
 # TODO add proper logger
 
 class KlickBrick(object):
@@ -54,6 +55,7 @@ class KlickBrick(object):
                 send_it_email(args.first_name, args.last_name)
             elif args.dev_tools is True:
                 print("installing dev tools")
+                install_dev_tools()
             else:
                 print("creating checklist, submitting it request, and installing dev tools")
         else:
@@ -66,7 +68,6 @@ def construct_greeting(name):
 
 def write_checklist():
     shutil.copyfile(f"{os.path.dirname(os.path.abspath(__file__))}/resources/onboard_checklist_template.md", f"{os.getcwd()}/onboarding_checklist.md")
-    # shutil.copyfile(os.path.abspath('klick_brick_cli/resources/onboard_checklist_template.md'), f"{os.getcwd()}/onboarding_checklist.md")
 
 
 def send_it_email(first_name, last_name):
@@ -82,6 +83,28 @@ def send_it_email(first_name, last_name):
     # TODO put this in a try and assert that exception is not thrown
     if sys.platform=='darwin':
         subprocess.Popen(['open', url])
+
+
+def install_dev_tools():
+    try:
+        output_brew_version= subprocess.check_output(['brew','--version'])
+        print(output_brew_version)
+    except:
+        print("please first install brew") #TODO install brew with curl requires sudo prompt
+
+    process = subprocess.Popen(['brew', 'install', 'git'],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(stderr)
+    else:
+        print("git installed")
+        process = subprocess.Popen(['git', '--version'],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        print(stdout)
 
 
 if __name__ == '__main__':

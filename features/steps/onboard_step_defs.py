@@ -1,6 +1,7 @@
 import sys
 import os
 import shlex
+import subprocess
 from behave import *
 from klick_brick_cli import klickbrick
 
@@ -28,3 +29,12 @@ def step_impl(context):
     output = sys.stdout.getvalue().strip() # because stdout is a StringIO instance
     assert "Christiansen" in output
     print(output)
+
+@then(u'git is installed')
+def step_impl(context):
+    process = subprocess.Popen(['git', '--version'],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    assert process.returncode == 0
+    assert "git version" in stdout.decode("utf-8")

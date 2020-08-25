@@ -10,12 +10,11 @@ Feature: Automate the onboarding workflow for new developers
     Then the email template is updated with the users name
 #    And the email client is successfully invoked
 
-  @skip
   Scenario: New Developer Tools Installation - git
     When the user runs KlickBrick 'onboard --dev-tools --first-name "Ole Kirk" --last-name Christiansen'
     Then git is installed
-    And git user profile is set with users name
-    And git commit template is configured
+#    And git user profile is set with users name
+#    And git commit template is configured
 
   @skip
   Scenario: New Developer Tools Installation - pyenv
