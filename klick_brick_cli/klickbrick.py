@@ -61,7 +61,11 @@ def construct_greeting(name):
 
 
 def write_checklist():
-    shutil.copyfile(os.path.abspath(f'{os.path.dirname(os.path.abspath(__file__))}/resources/onboard_checklist_template.md'), f"{os.getcwd()}/onboarding_checklist.md")
+    # TODO using this path is too brittle. Doing something like this is probably better:
+    #  f'{os.path.dirname(os.path.abspath(__file__))}/resources/onboard_checklist_template.md')
+    #  but doesn't work in Travis for some reason. Might want to throw the build in a docker container
+
+    shutil.copyfile(os.path.abspath('klick_brick_cli/resources/onboard_checklist_template.md'), f"{os.getcwd()}/onboarding_checklist.md")
 
 
 if __name__ == '__main__':
