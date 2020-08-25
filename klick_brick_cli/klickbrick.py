@@ -61,7 +61,7 @@ def construct_greeting(name):
 
 
 def write_checklist():
-    shutil.copyfile(os.path.abspath(f'{os.path.dirname(os.path.abspath(__file__))}/resources/onboard_checklist_template.md')), f"{os.getcwd()}/onboarding_checklist.md")
+    shutil.copyfile(f"{os.path.dirname(os.path.abspath(__file__))}/resources/onboard_checklist_template.md", f"{os.getcwd()}/onboarding_checklist.md")
     # shutil.copyfile(os.path.abspath('klick_brick_cli/resources/onboard_checklist_template.md'), f"{os.getcwd()}/onboarding_checklist.md")
 
 
