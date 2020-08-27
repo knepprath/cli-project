@@ -3,9 +3,14 @@ import sys
 import os
 import shutil
 import subprocess
+import urllib.request
+from pathlib import Path
 
 # TODO optimize imports
 # TODO add proper logger
+
+PYTHON_VERSION = "3.8.0"
+
 
 class KlickBrick(object):
 
@@ -92,19 +97,52 @@ def install_dev_tools():
     except:
         print("please first install brew") #TODO install brew with curl requires sudo prompt
 
-    process = subprocess.Popen(['brew', 'install', 'git'],
+    brew_install("git")
+    brew_install("pyenv")
+
+    configure_python()
+    install_poetry()
+
+
+def configure_python():
+    f = open(f"{str(Path.home())}/.zshrc", "a")
+    f.write("# *** pyenv configuration ***\n")
+    f.write('export PYENV_ROOT=\"$HOME/.pyenv\"\n')
+    f.write('export PATH=\"$PYENV_ROOT/bin:$PATH\"\n')
+    f.write('if command -v pyenv 1>/dev/null 2>&1; then\n  eval \"$(pyenv init -)\"\nfi\n')
+
+    process = subprocess.Popen(["pyenv", "install", PYTHON_VERSION],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
+    print(stdout)
+
+
+def install_poetry():
+    (fn,hd) = urllib.request.urlretrieve('https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py')
+    process = subprocess.Popen(['python', fn],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    print(stdout)
+
+
+def brew_install(package_name):
+    process = subprocess.Popen(['brew', 'install', package_name],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
     if process.returncode != 0:
         print(stderr)
     else:
-        print("git installed")
-        process = subprocess.Popen(['git', '--version'],
+        print(f"{package_name} installed")
+        process = subprocess.Popen([package_name, '--version'],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
         print(stdout)
+
 
 
 if __name__ == '__main__':
