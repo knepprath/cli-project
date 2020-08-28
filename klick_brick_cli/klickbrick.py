@@ -60,7 +60,7 @@ class KlickBrick(object):
                 send_it_email(args.first_name, args.last_name)
             elif args.dev_tools is True:
                 print("installing dev tools")
-                install_dev_tools()
+                install_dev_tools(args.first_name, args.last_name)
             else:
                 print("creating checklist, submitting it request, and installing dev tools")
         else:
@@ -90,32 +90,105 @@ def send_it_email(first_name, last_name):
         subprocess.Popen(['open', url])
 
 
-def install_dev_tools():
+def install_dev_tools(first_name, last_name):
     try:
         output_brew_version= subprocess.check_output(['brew','--version'])
         print(output_brew_version)
     except:
         print("please first install brew") #TODO install brew with curl requires sudo prompt
 
+    install_brew()
     brew_install("git")
+    configure_git(first_name, last_name)
+
     brew_install("pyenv")
 
     configure_python()
     install_poetry()
 
 
-def configure_python():
-    f = open(f"{str(Path.home())}/.zshrc", "a")
-    f.write("# *** pyenv configuration ***\n")
-    f.write('export PYENV_ROOT=\"$HOME/.pyenv\"\n')
-    f.write('export PATH=\"$PYENV_ROOT/bin:$PATH\"\n')
-    f.write('if command -v pyenv 1>/dev/null 2>&1; then\n  eval \"$(pyenv init -)\"\nfi\n')
+def install_brew():
+    process = subprocess.Popen(["brew", "--version"],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
 
-    process = subprocess.Popen(["pyenv", "install", PYTHON_VERSION],
+    if process.returncode == 0:
+        print("brew is already installed")
+    else:
+        (fn,hd) = urllib.request.urlretrieve('https://raw.githubusercontent.com/Homebrew/install/master/install.sh')
+        process = subprocess.Popen(['bash', fn],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        print(stdout)
+
+def configure_git(first_name, last_name):
+    process = subprocess.Popen(['git', 'config', '--global', 'user.name', first_name + " " + last_name],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    if process.returncode != 0:
+        print(stderr)
+    else:
+        print("git user.name configured")
+        process = subprocess.Popen(['git', 'config', '--global', 'user.name'],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        print(stdout)
+
+    shutil.copyfile(f"{os.path.dirname(os.path.abspath(__file__))}/resources/git_commit_template", f"{str(Path.home())}/.gitmessage")
+
+    process = subprocess.Popen(['git', 'config', '--global', 'commit.template', f"{str(Path.home())}/.gitmessage"],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     print(stdout)
+
+
+
+def configure_python():
+    process = subprocess.Popen(["python", "--version"],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               shell=True, executable='/bin/bash')
+    stdout, stderr = process.communicate()
+
+    if (PYTHON_VERSION in stdout.decode("utf-8")):
+        print(f"Python {PYTHON_VERSION} is already configured as global")
+    else:
+        f = open(f"{str(Path.home())}/.zshrc", "a")
+        f.write("# *** pyenv configuration ***\n")
+        f.write('export PYENV_ROOT=\"$HOME/.pyenv\"\n')
+        f.write('export PATH=\"$PYENV_ROOT/bin:$PATH\"\n')
+        f.write('if command -v pyenv 1>/dev/null 2>&1; then\n  eval \"$(pyenv init -)\"\nfi\n')
+        f.close()
+
+        process = subprocess.Popen(["pyenv", "versions"],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        print(stdout)
+
+        process = subprocess.Popen(["pyenv", "global"],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        print(stdout)
+
+        process = subprocess.Popen(["pyenv", "install", PYTHON_VERSION],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        print(stdout)
+
+        process = subprocess.Popen(["pyenv", "global", PYTHON_VERSION],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        print(stdout)
 
 
 def install_poetry():
@@ -128,20 +201,28 @@ def install_poetry():
 
 
 def brew_install(package_name):
-    process = subprocess.Popen(['brew', 'install', package_name],
+    process = subprocess.Popen([package_name],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
-    if process.returncode != 0:
-        print(stderr)
+    if process.returncode == 0:
+        print(f"The package {package_name} is already installed")
     else:
-        print(f"{package_name} installed")
-        process = subprocess.Popen([package_name, '--version'],
+        process = subprocess.Popen(['brew', 'install', package_name],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
-        print(stdout)
+
+        if process.returncode != 0:
+            print(stderr)
+        else:
+            print(f"{package_name} installed")
+            process = subprocess.Popen([package_name, '--version'],
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+            print(stdout)
 
 
 
