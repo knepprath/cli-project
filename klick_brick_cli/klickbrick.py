@@ -43,7 +43,7 @@ class KlickBrick(object):
             description='Record changes to the repository')
         parser.add_argument('--checklist', action='store_true')
         parser.add_argument('--it-request', action='store_true')
-        parser.add_argument('--dev-tools', action='store_true')
+        parser.add_argument('--dev-tools', nargs='?', default=False, const=True)
 
         parser.add_argument('--first-name')
         parser.add_argument('--last-name')
@@ -58,11 +58,14 @@ class KlickBrick(object):
             if args.it_request is True:
                 print("submitting it request")
                 send_it_email(args.first_name, args.last_name)
-            elif args.dev_tools is True:
+            elif args.dev_tools is not False:
                 print("installing dev tools")
-                install_dev_tools(args.first_name, args.last_name)
+                install_dev_tools(args.dev_tools, args.first_name, args.last_name)
             else:
                 print("creating checklist, submitting it request, and installing dev tools")
+                write_checklist()
+                send_it_email(args.first_name, args.last_name)
+                install_dev_tools(True, args.first_name, args.last_name)
         else:
             print("missing required args")
 
@@ -90,24 +93,24 @@ def send_it_email(first_name, last_name):
         subprocess.Popen(['open', url])
 
 
-def install_dev_tools(first_name, last_name):
-    try:
-        output_brew_version= subprocess.check_output(['brew','--version'])
-        print(output_brew_version)
-    except:
-        print("please first install brew") #TODO install brew with curl requires sudo prompt
-
+def install_dev_tools(selection, first_name, last_name):
     install_brew()
-    brew_install("git")
-    configure_git(first_name, last_name)
 
-    brew_install("pyenv")
-
-    configure_python()
-    install_poetry()
+    if selection == "git" or selection is True:
+        brew_install("git")
+        configure_git(first_name, last_name)
+    elif selection == "pyenv" or selection is True:
+        brew_install("pyenv")
+        configure_python()
+    elif selection == "poetry" or selection is True:
+        install_poetry()
+        configure_poetry_repository()
 
 
 def install_brew():
+    output_brew_version= subprocess.check_output(['brew','--version'])
+    print(output_brew_version)
+
     process = subprocess.Popen(["brew", "--version"],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
@@ -123,6 +126,7 @@ def install_brew():
         stdout, stderr = process.communicate()
         print(stdout)
 
+
 def configure_git(first_name, last_name):
     process = subprocess.Popen(['git', 'config', '--global', 'user.name', first_name + " " + last_name],
                                stdout=subprocess.PIPE,
@@ -133,11 +137,6 @@ def configure_git(first_name, last_name):
         print(stderr)
     else:
         print("git user.name configured")
-        process = subprocess.Popen(['git', 'config', '--global', 'user.name'],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        print(stdout)
 
     shutil.copyfile(f"{os.path.dirname(os.path.abspath(__file__))}/resources/git_commit_template", f"{str(Path.home())}/.gitmessage")
 
@@ -148,12 +147,10 @@ def configure_git(first_name, last_name):
     print(stdout)
 
 
-
 def configure_python():
-    process = subprocess.Popen(["python", "--version"],
+    process = subprocess.Popen(["pyenv", "global"],
                                stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               shell=True, executable='/bin/bash')
+                               stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
     if (PYTHON_VERSION in stdout.decode("utf-8")):
@@ -165,18 +162,6 @@ def configure_python():
         f.write('export PATH=\"$PYENV_ROOT/bin:$PATH\"\n')
         f.write('if command -v pyenv 1>/dev/null 2>&1; then\n  eval \"$(pyenv init -)\"\nfi\n')
         f.close()
-
-        process = subprocess.Popen(["pyenv", "versions"],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        print(stdout)
-
-        process = subprocess.Popen(["pyenv", "global"],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        print(stdout)
 
         process = subprocess.Popen(["pyenv", "install", PYTHON_VERSION],
                                    stdout=subprocess.PIPE,
@@ -194,6 +179,18 @@ def configure_python():
 def install_poetry():
     (fn,hd) = urllib.request.urlretrieve('https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py')
     process = subprocess.Popen(['python', fn],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    f = open(f"{str(Path.home())}/.zshrc", "a")
+    f.write("# *** poetry configuration ***\n")
+    f.write('export PATH=\"$HOME/.poetry/bin:$PATH\"\n')
+    f.close()
+
+
+def configure_poetry_repository():
+    process = subprocess.Popen([f"{str(Path.home())}/.poetry/bin/poetry", "config", "repositories.klickbrick", "https://klick.brick/simple/"],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
