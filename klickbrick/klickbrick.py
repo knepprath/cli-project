@@ -223,9 +223,11 @@ def brew_install(package_name):
             print(stdout)
 
 
+# Entry point for poetry so package is executable
 def main():
     KlickBrick()
 
 
+# Support invoking the script directly from source
 if __name__ == '__main__':
     main()

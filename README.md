@@ -1,4 +1,4 @@
-# cli-project
+# KlickBrick CLI
 *NOTE:* This project is for educational purposes. It is a CLI built for the fictional toy company called KlickBrick  
 
 The KlickBrick CLI is design to be an extensible swiss army knife used by Developers across the engineering
@@ -8,22 +8,15 @@ The KlickBrick CLI is design to be an extensible swiss army knife used by Develo
 ## Installation 
 The initial iteration of the CLI has been designed for developers on macOS, but some commands will work on Windows
  and Linux as well. 
- 
- 
 
-## Testing
-To run unit tests `python -m unittest discover -b`
+The CLI requires Python3. It is currently distributed on the TestPyPI repository and can be installed with the
+ following command: 
+ ```
+pip install -i https://test.pypi.org/simple/ klickbrick
+ ```
 
-To execute integration tests run `behave`
-
-
-## Publish
-*NOTE:* This project is currently publishing to TestPyPI repository because the project is for educational purposes. 
-
-To publish a build to PyPI the commit needs to be tagged
-
+Now try running a command:
 ```
-git tag -a v1.2
-git push --tags
+klickbrick help
 ```
 
