@@ -1,6 +1,6 @@
 import unittest
 import sys
-from klick_brick_cli import klickbrick
+from klickbrick import klickbrick
 
 
 

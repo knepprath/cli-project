@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "klick_brick_cli"
-version = "0.1.6"
+name = "klickbrick"
+version = "0.0.1"
 description = ""
 authors = ["David Knepprath <david.knepprath@gmail.com>"]
 

@@ -1,6 +1,6 @@
 import sys
 from behave import *
-from klick_brick_cli import klickbrick
+from klickbrick import klickbrick
 
 @given('we run the hello command')
 def step_impl(context):

@@ -3,7 +3,7 @@ import os
 import shlex
 import subprocess
 from behave import *
-from klick_brick_cli import klickbrick
+from klickbrick import klickbrick
 from pathlib import Path
 
 

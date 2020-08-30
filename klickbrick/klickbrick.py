@@ -62,6 +62,7 @@ class KlickBrick(object):
                 print("installing dev tools")
                 install_dev_tools(args.dev_tools, args.first_name, args.last_name)
             else:
+                # TODO better algo to solve this so it's more maintainable
                 print("creating checklist, submitting it request, and installing dev tools")
                 write_checklist()
                 send_it_email(args.first_name, args.last_name)
@@ -88,7 +89,7 @@ def send_it_email(first_name, last_name):
     url = "mailto:{}?subject={}&body={}"
     url = url.format(address, subject, body)
 
-    # TODO put this in a try and assert that exception is not thrown
+    # TODO put this in a try and assert that exception is not thrown in test
     if sys.platform=='darwin':
         subprocess.Popen(['open', url])
 
