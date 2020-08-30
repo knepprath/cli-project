@@ -223,6 +223,9 @@ def brew_install(package_name):
             print(stdout)
 
 
+def main():
+    KlickBrick()
+
 
 if __name__ == '__main__':
-    KlickBrick()
+    main()

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "klickbrick"
-version = "0.0.3"
+version = "0.0.4"
 description = ""
 authors = ["David Knepprath <david.knepprath@gmail.com>"]
 
@@ -11,7 +11,7 @@ python = "^3.6"
 behave = "^1.2"
 
 [tool.poetry.scripts]
-klickbrick = 'klickbrick:main'
+klickbrick = 'klickbrick.klickbrick:main'
 
 [build-system]
 requires = ["poetry>=0.12"]
