@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import urllib.request
+import inspect
 from pathlib import Path
 
 # TODO optimize imports
@@ -16,15 +17,37 @@ class KlickBrick(object):
 
     def __init__(self):
         parser = argparse.ArgumentParser(prog='klickbrick')
-        parser.add_argument('command')
+        parser.add_argument('invoke')
 
-        args = parser.parse_args(sys.argv[1:2])
-        if not hasattr(self, args.command):
+        subcommand = parser.parse_args(sys.argv[1:2])
+        self.subcommand_args = sys.argv[1:]
+
+        if not hasattr(self, subcommand.invoke):
             print('Unrecognized command')
             parser.print_help()
             exit(1)
         # use dispatch pattern to invoke method with same name
-        getattr(self, args.command)()
+        getattr(self, subcommand.invoke)()
+        exit(0)
+
+    def help(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('help',
+                            help="Optional flag to be more personal")
+        parser.add_argument(
+            'name',
+            nargs='?',
+            help='Command to show help for'
+        )
+        args = parser.parse_args(self.subcommand_args)
+
+        if args.name:
+            self.subcommand_args.append('-h')
+            getattr(self, args.name)()
+        else:
+            print("Use help [name] to show help for given command")
+            print("List of available commands:")
+            print([attr for attr in dir(self) if inspect.ismethod(getattr(self, attr))][1:])
 
     def hello(self):
         parser = argparse.ArgumentParser(
@@ -35,20 +58,27 @@ class KlickBrick(object):
                             default="world",
                             help="Optional flag to be more personal")
 
-        args = parser.parse_args(sys.argv[2:])
+        args = parser.parse_args(self.subcommand_args[1:])
         print(construct_greeting(args.name))
 
     def onboard(self):
-        parser = argparse.ArgumentParser(
-            description='Record changes to the repository')
-        parser.add_argument('--checklist', action='store_true')
-        parser.add_argument('--it-request', action='store_true')
-        parser.add_argument('--dev-tools', nargs='?', default=False, const=True)
+        parser = argparse.ArgumentParser(description='Installs and configures all software needed by new developers')
+        parser.add_argument('--checklist',
+                            action='store_true',
+                            help="Generate a checklist for new developers to effectively complete onboarding process")
+        parser.add_argument('--it-request',
+                            action='store_true',
+                            help="Creates and email draft with for the IT department to complete onboarding process with custom information provided by new employee")
+        parser.add_argument('--dev-tools',
+                            nargs='?',
+                            default=False,
+                            const=True,
+                            help="[DEV_TOOLS] is optional argument to install and configure a single tool")
 
         parser.add_argument('--first-name')
         parser.add_argument('--last-name')
 
-        args = parser.parse_args(sys.argv[2:])
+        args = parser.parse_args(self.subcommand_args[1:])
 
         if args.checklist is True:
             print("creating checklist")

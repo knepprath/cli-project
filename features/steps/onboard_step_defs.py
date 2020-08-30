@@ -13,8 +13,8 @@ def step_impl(context, command):
     args = shlex.split(command)
     old_sys_argv = sys.argv
     sys.argv = [old_sys_argv[0]] + args
-
-    # print(args)
+    print(args)
+    print(sys.argv)
     klickbrick.KlickBrick() # TODO evaluate how to invoke more realistically to a pip install of the module, but in environment that can be cleaned up
 
 
