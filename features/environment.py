@@ -47,6 +47,6 @@ def before_scenario(context, scenario):
     except FileNotFoundError:
         pass
     try:
-        shutil.rmtree("/Users/davidknepprath/custom/path/new-project")
+        shutil.rmtree(os.path.expanduser("~/custom/path/new-project"))
     except FileNotFoundError:
         pass
