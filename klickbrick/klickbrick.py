@@ -28,7 +28,6 @@ class KlickBrick(object):
             exit(1)
         # use dispatch pattern to invoke method with same name
         getattr(self, subcommand.invoke)()
-        exit(0)
 
     def help(self):
         parser = argparse.ArgumentParser()
