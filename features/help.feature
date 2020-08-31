@@ -1,3 +1,4 @@
+@skip
 Feature: Document usage of commands
 
   Scenario: Document Available Commands

@@ -15,6 +15,12 @@ The CLI requires Python3. It is currently distributed on the TestPyPI repository
 pip install -i https://test.pypi.org/simple/ klickbrick
  ```
 
+To update the CLI:
+ ```
+pip install -i https://test.pypi.org/simple/ klickbrick --upgrade
+ ```
+
+
 Now try running a command:
 ```
 klickbrick help

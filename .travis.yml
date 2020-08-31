@@ -1,7 +1,7 @@
 language: python
 dist: xenial
 python:
-  - "3.6"
+  - "3.7"
 
 stages:
   - Quality
@@ -32,6 +32,6 @@ jobs:
         skip_cleanup: true
         on:
           branch: master
-          python: '3.6'
+          python: '3.7'
           tags: true
       if: tag IS present

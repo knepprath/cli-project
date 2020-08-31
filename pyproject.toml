@@ -5,10 +5,11 @@ description = ""
 authors = ["David Knepprath <david.knepprath@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 behave = "^1.2"
+pre-commit = "^2.7"
 
 [tool.poetry.scripts]
 klickbrick = 'klickbrick.klickbrick:main'
