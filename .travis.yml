@@ -20,7 +20,7 @@ jobs:
       script: make test
     - stage: Quality
       name: lint
-      script: pre-commit run --all-files
+      script: make lint
     - name: integration
       script: make integration
     - stage: Publish

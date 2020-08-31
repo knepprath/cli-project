@@ -3,3 +3,6 @@ test:
 
 integration:
 	behave
+
+lint:
+    pre-commit run --all-files
