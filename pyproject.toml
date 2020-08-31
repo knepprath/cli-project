@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "klickbrick"
-version = "0.0.5"
+version = "0.0.6"
 description = ""
 authors = ["David Knepprath <david.knepprath@gmail.com>"]
 
