@@ -1,12 +1,29 @@
 # Contributing to klickbrick CLI 
 
+## Development
+This project uses Poetry for dependency management and packaging.
+
+To install dependencies for development, run: 
+```
+poetry install 
+```
+
 ## Testing
-To run unit tests `python -m unittest discover -b`
+Use Make to run tests
 
-To execute integration tests run `behave`
+For unit tests:
+
+```
+make test
+```
+
+Integration test:
+```
+make integration
+```
 
 
-## Publish
+## Publishing
 *NOTE:* This project is currently publishing to TestPyPI repository because the project is for educational purposes. 
 
 To publish a build to PyPI the commit needs to be tagged
@@ -16,3 +33,16 @@ git tag -a v1.2
 git push --tags
 ```
 
+## Contributing
+
+1. Create your feature branch (`git checkout -b feature/fooBar`)
+1. Commit your changes (`git commit -am 'Add some fooBar'`)
+   - NOTE: this project uses git pre-commit hooks to format and lint code changes to align with standard conventions. 
+1. Push to the branch (`git push origin feature/fooBar`)
+1. Create a new Pull Request
+
+
+## Release History
+
+* 0.0.x
+    * Proof of Concept

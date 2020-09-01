@@ -20,7 +20,7 @@ To update the CLI:
 pip install -i https://test.pypi.org/simple/ klickbrick --upgrade
  ```
 
-
+## Usage
 Now try running a command:
 ```
 klickbrick help
