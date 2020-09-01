@@ -12,12 +12,18 @@ def step_impl(context):
 
 @then("an error message is displayed stating the directory already exits")
 def step_impl(context):
-    output = sys.stdout.getvalue().strip()  # because stdout is a StringIO instance
-    assert "ERROR: Cannot create project. The directory already exits" in output
+    output = (
+        sys.stdout.getvalue().strip()
+    )  # because stdout is a StringIO instance
+    assert (
+        "ERROR: Cannot create project. The directory already exits" in output
+    )
     print(output)
 
 
-@then("a directory called `new-project` is created in the current working directory")
+@then(
+    "a directory called `new-project` is created in the current working directory"
+)
 def step_impl(context):
     assert os.path.isdir(f"{os.getcwd()}/new-project")
 

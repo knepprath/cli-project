@@ -19,7 +19,9 @@ def step_impl(context, command):
 
 @then("an onboarding checklist is generated")
 def step_impl(context):
-    output = sys.stdout.getvalue().strip()  # because stdout is a StringIO instance
+    output = (
+        sys.stdout.getvalue().strip()
+    )  # because stdout is a StringIO instance
     assert "creating checklist" in output
     print(output)
 
@@ -31,7 +33,9 @@ def step_impl(context):
 
 @then("an IT onboarding request has been created")
 def step_impl(context):
-    output = sys.stdout.getvalue().strip()  # because stdout is a StringIO instance
+    output = (
+        sys.stdout.getvalue().strip()
+    )  # because stdout is a StringIO instance
     assert "Christiansen" in output
     print(output)
 
@@ -103,7 +107,11 @@ def step_impl(context):
 @then("the KlickBrick repository is configured")
 def step_impl(context):
     process = subprocess.Popen(
-        [f"{str(Path.home())}/.poetry/bin/poetry", "config", "repositories.klickbrick"],
+        [
+            f"{str(Path.home())}/.poetry/bin/poetry",
+            "config",
+            "repositories.klickbrick",
+        ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )

@@ -14,6 +14,8 @@ def step_impl(context):
 
 @then('the command returns "hello world"')
 def step_impl(context):
-    output = sys.stdout.getvalue().strip()  # because stdout is a StringIO instance
+    output = (
+        sys.stdout.getvalue().strip()
+    )  # because stdout is a StringIO instance
     assert output == "Hello david"
     print(output)

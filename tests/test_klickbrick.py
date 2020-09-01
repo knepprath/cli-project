@@ -17,7 +17,9 @@ class TestCLI(unittest.TestCase):
 
         if not hasattr(sys.stdout, "getvalue"):
             self.fail("need to run in buffered mode")
-        output = sys.stdout.getvalue().strip()  # because stdout is a StringIO instance
+        output = (
+            sys.stdout.getvalue().strip()
+        )  # because stdout is a StringIO instance
         self.assertEquals(output, "Hello david")
 
 

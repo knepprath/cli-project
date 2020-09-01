@@ -43,13 +43,17 @@ class KlickBrick(object):
             print("Use help [name] to show help for given command")
             print("List of available commands:")
             print(
-                [attr for attr in dir(self) if inspect.ismethod(getattr(self, attr))][
-                    1:
-                ]
+                [
+                    attr
+                    for attr in dir(self)
+                    if inspect.ismethod(getattr(self, attr))
+                ][1:]
             )
 
     def hello(self):
-        parser = argparse.ArgumentParser(description="Record changes to the repository")
+        parser = argparse.ArgumentParser(
+            description="Record changes to the repository"
+        )
         parser.add_argument(
             "--name",
             "-n",
@@ -92,7 +96,9 @@ class KlickBrick(object):
         if args.framework in FRAMEWORKS:
             getattr(self, "init_" + args.framework)(args.path, args.name)
         else:
-            print(f"the suppored frameworks for the init command are {FRAMEWORKS}")
+            print(
+                f"the suppored frameworks for the init command are {FRAMEWORKS}"
+            )
 
     def init_python(self, parent, name):
         path = parent + "/" + name
@@ -102,11 +108,15 @@ class KlickBrick(object):
         try:
             Path(path).mkdir(parents=True)
         except FileExistsError:
-            print(f"ERROR: Cannot create project. The directory already exits: {path}")
+            print(
+                f"ERROR: Cannot create project. The directory already exits: {path}"
+            )
             return
 
         process = subprocess.Popen(
-            ["git", "init", f"{path}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            ["git", "init", f"{path}"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
         stdout, stderr = process.communicate()
         print(stdout)
@@ -149,7 +159,9 @@ class KlickBrick(object):
                 send_it_email(args.first_name, args.last_name)
             elif args.dev_tools is not False:
                 print("installing dev tools")
-                install_dev_tools(args.dev_tools, args.first_name, args.last_name)
+                install_dev_tools(
+                    args.dev_tools, args.first_name, args.last_name
+                )
             else:
                 # TODO better algo to solve this so it's more maintainable
                 print(
@@ -226,7 +238,13 @@ def install_brew():
 
 def configure_git(first_name, last_name):
     process = subprocess.Popen(
-        ["git", "config", "--global", "user.name", first_name + " " + last_name],
+        [
+            "git",
+            "config",
+            "--global",
+            "user.name",
+            first_name + " " + last_name,
+        ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
