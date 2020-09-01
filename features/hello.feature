@@ -1,4 +1,3 @@
-@skip
 Feature: showing off behave
 
   Scenario: run hello command

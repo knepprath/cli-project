@@ -1,4 +1,3 @@
-@skip
 Feature: Automate the onboarding workflow for new developers
 
   Scenario: New Developer Checklist
@@ -9,7 +8,6 @@ Feature: Automate the onboarding workflow for new developers
   Scenario: New Developer IT Onboarding Request
     When the user runs KlickBrick 'onboard --it-request --first-name "Ole Kirk" --last-name Christiansen'
     Then an IT onboarding request has been created
-#    And the email client is successfully invoked
 
   @use.with_os=darwin
   Scenario: New Developer Tools Installation - git

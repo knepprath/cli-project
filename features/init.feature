@@ -19,10 +19,22 @@ Feature: Initialize a code repository for a new project
     When the user runs KlickBrick 'init --name new-project'
     Then the project has a python environment created
 
-    # TODO poetry? or what would it look like to initialize for a Django project?
   @skip
   Scenario: Initialize poetry
     When the user runs KlickBrick 'init --name new-project'
     Then the project is initialized with poetry
 
-    # TODO scenario for initialize with all of the company specific files/folder structure?
+  @skip
+  Scenario: Initialize with standard config files
+    When the user runs KlickBrick 'init --name new-project'
+    Then there is a default .gitignore
+    Then there is a README template
+    Then there is a .travis.yml template
+    Then there is a features directory
+
+  @skip
+  Scenario: Initialize python project with standard config files
+    When the user runs KlickBrick 'init --name new-project --framework python'
+    Then there is a standard black config in pyproject.toml
+    Then there is a standard .flake8 config file
+    Then there is a standard .pre-commit-config.yaml
