@@ -1,5 +1,6 @@
-Feature: Usage telemtry is reported to backend server
+Feature: Usage telemetry is reported to backend server
 
+  @skip
   Scenario: CLI reports usage and context
     When user executes a command with the CLI
     Then the CLI reports the command
@@ -7,6 +8,7 @@ Feature: Usage telemtry is reported to backend server
     And the CLI reports the Python version
     And the CLI reports the user config
 
+  @skip
   Scenario: CLI Telemetry fails gracefully
     Given connection to the backend server is interuptted
     When user executes a command with the CLI
