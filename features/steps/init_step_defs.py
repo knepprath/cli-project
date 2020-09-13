@@ -1,6 +1,5 @@
 from behave import *
 import os
-import sys
 from pathlib import Path
 
 

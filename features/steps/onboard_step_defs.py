@@ -1,20 +1,19 @@
 import os
 import shlex
-import subprocess
 from behave import *
 from pathlib import Path
+
+from klickbrick.shell import execute
 
 
 @when("the user runs KlickBrick '{command}'")
 def step_impl(context, command):
     args = shlex.split(command)
-    process = subprocess.Popen(
-        ["python3", f"{os.getcwd()}/klickbrick/klickbrick.py"] + args,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+    response_code, output = execute(
+        ["python3", f"{os.getcwd()}/klickbrick/klickbrick.py"] + args
     )
-    stdout, stderr = process.communicate()
-    context.response = stdout.decode("utf-8")
+    print(output)
+    context.response = output
 
 
 @then("an onboarding checklist is generated")
@@ -34,82 +33,57 @@ def step_impl(context):
 
 @then("git is installed")
 def step_impl(context):
-    process = subprocess.Popen(
-        ["git", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    stdout, stderr = process.communicate()
-    assert process.returncode == 0
-    assert "git version" in stdout.decode("utf-8")
+    response_code, output = execute(["git", "--version"])
+    assert response_code == 0
+    assert "git version" in output
 
 
 @then("git user profile is set with users name")
 def step_impl(context):
-    process = subprocess.Popen(
-        ["git", "config", "--global", "user.name"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    stdout, stderr = process.communicate()
-    assert process.returncode == 0
-    assert "Ole Kirk Christiansen" in stdout.decode("utf-8")
+    response_code, output = execute(["git", "config", "--global", "user.name"])
+    assert response_code == 0
+    assert "Ole Kirk Christiansen" in output
 
 
 @then("git commit template is configured")
 def step_impl(context):
-    process = subprocess.Popen(
-        ["git", "config", "--global", "commit.template"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+    response_code, output = execute(
+        ["git", "config", "--global", "commit.template"]
     )
-    stdout, stderr = process.communicate()
-    assert process.returncode == 0
-    assert ".gitmessage" in stdout.decode("utf-8")
+    assert response_code == 0
+    assert ".gitmessage" in output
 
 
 @then("pyenv is installed")
 def step_impl(context):
-    process = subprocess.Popen(
-        ["pyenv", "versions"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    stdout, stderr = process.communicate()
-    assert process.returncode == 0
+    response_code, output = execute(["pyenv", "versions"])
+    assert response_code == 0
 
 
 @then("Python version 3.8.0 is set as Global default")
 def step_impl(context):
-    process = subprocess.Popen(
-        ["pyenv", "global"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    stdout, stderr = process.communicate()
-    assert process.returncode == 0
-    assert "3.8.0" in stdout.decode("utf-8")
+    response_code, output = execute(["pyenv", "global"])
+    assert response_code == 0
+    assert "3.8.0" in output
 
 
 @then("poetry is installed")
 def step_impl(context):
-    process = subprocess.Popen(
-        [f"{str(Path.home())}/.poetry/bin/poetry"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    stdout, stderr = process.communicate()
-    assert process.returncode == 0
+    response_code, output = execute([f"{str(Path.home())}/.poetry/bin/poetry"])
+    assert response_code == 0
 
 
 @then("the KlickBrick repository is configured")
 def step_impl(context):
-    process = subprocess.Popen(
+    response_code, output = execute(
         [
             f"{str(Path.home())}/.poetry/bin/poetry",
             "config",
             "repositories.klickbrick",
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        ]
     )
-    stdout, stderr = process.communicate()
-    assert process.returncode == 0
-    assert "klick.brick" in stdout.decode("utf-8")
+    assert response_code == 0
+    assert "klick.brick" in output
 
 
 @then("git is installed and configured")

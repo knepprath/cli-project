@@ -1,4 +1,3 @@
-import sys
 from behave import *
 
 

@@ -1,23 +1,21 @@
 import os
 from behave import *
-import subprocess
+
+from klickbrick.shell import execute
 
 
 @given("we run the hello command")
 def step_impl(context):
-    process = subprocess.Popen(
+    response_code, output = execute(
         [
             "python3",
             f"{os.getcwd()}/klickbrick/klickbrick.py",
             "hello",
             "--name",
             "david",
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        ]
     )
-    stdout, stderr = process.communicate()
-    context.response = stdout.decode("utf-8")
+    context.response = output
 
 
 @then('the command returns "hello world"')
