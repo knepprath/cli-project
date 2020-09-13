@@ -26,6 +26,8 @@ make integration
 ## Publishing
 *NOTE:* This project is currently publishing to TestPyPI repository because the project is for educational purposes. 
 
+Update the `version` in `pyproject.toml`.
+
 To publish a build to PyPI the commit needs to be tagged
 
 ```
