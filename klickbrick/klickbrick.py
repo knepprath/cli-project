@@ -1,19 +1,16 @@
 import argparse
 import sys
 import os
-import shutil
 import requests
-import urllib.request
 import inspect
 from pathlib import Path
 
 from klickbrick import shell
-from klickbrick import brew
+from klickbrick import scripts
 
 # TODO optimize imports
 # TODO add proper logger
 
-PYTHON_VERSION = "3.8.0"
 
 FRAMEWORKS = ["python"]
 
@@ -81,7 +78,7 @@ class KlickBrick(object):
         )
 
         args = parser.parse_args(self.subcommand_args[1:])
-        print(construct_greeting(args.name))
+        print(scripts.construct_greeting(args.name))
 
     def init(self):
         parser = argparse.ArgumentParser(
@@ -115,7 +112,7 @@ class KlickBrick(object):
             getattr(self, "init_" + args.framework)(args.path, args.name)
         else:
             print(
-                f"the suppored frameworks for the init command are {FRAMEWORKS}"
+                f"the supported frameworks for the init command are {FRAMEWORKS}"
             )
 
     def init_python(self, parent, name):
@@ -162,15 +159,15 @@ class KlickBrick(object):
 
         if args.checklist is True:
             print("creating checklist")
-            write_checklist()
+            scripts.write_checklist()
         # All other options require additional flags
         elif args.first_name is not None and args.last_name is not None:
             if args.it_request is True:
                 print("submitting it request")
-                send_it_email(args.first_name, args.last_name)
+                scripts.send_it_email(args.first_name, args.last_name)
             elif args.dev_tools is not False:
                 print("installing dev tools")
-                install_dev_tools(
+                scripts.install_dev_tools(
                     args.dev_tools, args.first_name, args.last_name
                 )
             else:
@@ -178,144 +175,13 @@ class KlickBrick(object):
                 print(
                     "creating checklist, submitting it request, and installing dev tools"
                 )
-                write_checklist()
-                send_it_email(args.first_name, args.last_name)
-                install_dev_tools(True, args.first_name, args.last_name)
+                scripts.write_checklist()
+                scripts.send_it_email(args.first_name, args.last_name)
+                scripts.install_dev_tools(
+                    True, args.first_name, args.last_name
+                )
         else:
             print("missing required args")
-
-
-def construct_greeting(name):
-    return f"Hello {name}"
-
-
-def write_checklist():
-    shutil.copyfile(
-        f"{os.path.dirname(os.path.abspath(__file__))}/resources/onboard_checklist_template.md",
-        f"{os.getcwd()}/onboarding_checklist.md",
-    )
-
-
-def send_it_email(first_name, last_name):
-    address = "it@example.com"
-    subject = "subject of email"
-
-    body = f"The user {first_name} {last_name} is being onboarded"
-    print(body)
-
-    url = "mailto:{}?subject={}&body={}"
-    url = url.format(address, subject, body)
-
-    # TODO put this in a try and assert that exception is not thrown in test
-    if sys.platform == "darwin":
-        return_code, output = shell.execute(["open", url])
-
-
-def install_dev_tools(selection, first_name, last_name):
-    install_brew()
-
-    if selection == "git" or selection is True:
-        brew.install("git")
-        configure_git(first_name, last_name)
-    elif selection == "pyenv" or selection is True:
-        brew.install("pyenv")
-        configure_python()
-    elif selection == "poetry" or selection is True:
-        install_poetry()
-        configure_poetry_repository()
-
-
-def install_brew():
-    return_code, output = shell.execute(["brew", "--version"])
-
-    if return_code == 0:
-        print("WARNING : brew is already installed")
-    else:
-        (fn, hd) = urllib.request.urlretrieve(
-            "https://raw.githubusercontent.com/Homebrew/install/master/install.sh"
-        )
-        return_code, output = shell.execute(["bash", fn])
-
-
-def configure_git(first_name, last_name):
-    return_code, output = shell.execute(
-        [
-            "git",
-            "config",
-            "--global",
-            "user.name",
-            first_name + " " + last_name,
-        ]
-    )
-
-    if return_code != 0:
-        print("ERROR : git user.name was not configured")
-
-    shutil.copyfile(
-        f"{os.path.dirname(os.path.abspath(__file__))}/resources/git_commit_template",
-        f"{str(Path.home())}/.gitmessage",
-    )
-
-    return_code, output = shell.execute(
-        [
-            "git",
-            "config",
-            "--global",
-            "commit.template",
-            f"{str(Path.home())}/.gitmessage",
-        ]
-    )
-
-    if return_code != 0:
-        print("ERROR : git commit.template was not configured")
-
-
-def configure_python():
-    return_code, output = shell.execute(["pyenv", "global"])
-
-    if PYTHON_VERSION in output:
-        print(f"Python {PYTHON_VERSION} is already configured as global")
-    else:
-        f = open(f"{str(Path.home())}/.zshrc", "a")
-        f.write("# *** pyenv configuration ***\n")
-        f.write('export PYENV_ROOT="$HOME/.pyenv"\n')
-        f.write('export PATH="$PYENV_ROOT/bin:$PATH"\n')
-        f.write(
-            'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi\n'
-        )
-        f.close()
-
-        return_code, output = shell.execute(
-            ["pyenv", "install", PYTHON_VERSION]
-        )
-
-        return_code, output = shell.execute(
-            ["pyenv", "global", PYTHON_VERSION]
-        )
-
-
-def install_poetry():
-    (fn, hd) = urllib.request.urlretrieve(
-        "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py"
-    )
-
-    return_code, output = shell.execute(["python", fn])
-
-    f = open(f"{str(Path.home())}/.zshrc", "a")
-    f.write("# *** poetry configuration ***\n")
-    f.write('export PATH="$HOME/.poetry/bin:$PATH"\n')
-    f.close()
-
-
-def configure_poetry_repository():
-    return_code, output = shell.execute(
-        [
-            f"{str(Path.home())}/.poetry/bin/poetry",
-            "config",
-            "repositories.klickbrick",
-            "https://klick.brick/simple/",
-        ]
-    )
 
 
 def send_metric(metric):

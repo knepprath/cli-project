@@ -42,6 +42,7 @@ def before_scenario(context, scenario):
         return
 
     # TODO cleanup state better
+    # TODO Uninstall all the things that get installed by the CLI, should this be a CLI command too?
     try:
         shutil.rmtree(f"{os.getcwd()}/new-project")
     except FileNotFoundError:
