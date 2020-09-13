@@ -7,8 +7,8 @@ import urllib.request
 import inspect
 from pathlib import Path
 
-import shell
-import brew
+from klickbrick import shell
+from klickbrick import brew
 
 # TODO optimize imports
 # TODO add proper logger
@@ -23,20 +23,20 @@ class KlickBrick(object):
         parser = argparse.ArgumentParser(prog="klickbrick")
         parser.add_argument("invoke")
 
-        send_metric(
-            {
-                "userId": "DK",
-                "osPlatform": "mac os x",
-                "osVersion": "10.15.6",
-                "pythonVersion": "3.8.9",
-                "command": {
-                    "input": " ".join(sys.argv[1:]),
-                    "exitReason": "blah",
-                    "exitCode": "0",
-                    "duration": "0m0.001s",
-                },
-            }
-        )
+        # send_metric(
+        #     {
+        #         "userId": "DK",
+        #         "osPlatform": "mac os x",
+        #         "osVersion": "10.15.6",
+        #         "pythonVersion": "3.8.9",
+        #         "command": {
+        #             "input": " ".join(sys.argv[1:]),
+        #             "exitReason": "blah",
+        #             "exitCode": "0",
+        #             "duration": "0m0.001s",
+        #         },
+        #     }
+        # )
 
         subcommand = parser.parse_args(sys.argv[1:2])
         self.subcommand_args = sys.argv[1:]

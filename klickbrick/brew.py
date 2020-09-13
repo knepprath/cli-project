@@ -1,4 +1,4 @@
-import shell
+from klickbrick import shell
 
 
 def install(package_name):

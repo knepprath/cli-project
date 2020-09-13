@@ -9,9 +9,7 @@ from klickbrick.shell import execute
 @when("the user runs KlickBrick '{command}'")
 def step_impl(context, command):
     args = shlex.split(command)
-    response_code, output = execute(
-        ["python", f"{os.getcwd()}/klickbrick/klickbrick.py"] + args
-    )
+    response_code, output = execute(["poetry", "run", "klickbrick"] + args)
     print(output)
     context.response = output
 

@@ -1,4 +1,3 @@
-import os
 from behave import *
 
 from klickbrick.shell import execute
@@ -8,8 +7,9 @@ from klickbrick.shell import execute
 def step_impl(context):
     response_code, output = execute(
         [
-            "python",
-            f"{os.getcwd()}/klickbrick/klickbrick.py",
+            "poetry",
+            "run",
+            "klickbrick",
             "hello",
             "--name",
             "david",
