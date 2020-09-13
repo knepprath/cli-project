@@ -1,29 +1,25 @@
-import sys
 import os
 import shlex
 import subprocess
 from behave import *
-from klickbrick import klickbrick
 from pathlib import Path
 
 
 @when("the user runs KlickBrick '{command}'")
 def step_impl(context, command):
     args = shlex.split(command)
-    old_sys_argv = sys.argv
-    sys.argv = [old_sys_argv[0]] + args
-    print(args)
-    print(sys.argv)
-    klickbrick.KlickBrick()  # TODO evaluate how to invoke more realistically to a pip install of the module, but in environment that can be cleaned up
+    process = subprocess.Popen(
+        ["python3", f"{os.getcwd()}/klickbrick/klickbrick.py"] + args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = process.communicate()
+    context.response = stdout.decode("utf-8")
 
 
 @then("an onboarding checklist is generated")
 def step_impl(context):
-    output = (
-        sys.stdout.getvalue().strip()
-    )  # because stdout is a StringIO instance
-    assert "creating checklist" in output
-    print(output)
+    assert "creating checklist" in context.response
 
 
 @then("the checklist is in Markdown format")
@@ -33,11 +29,7 @@ def step_impl(context):
 
 @then("an IT onboarding request has been created")
 def step_impl(context):
-    output = (
-        sys.stdout.getvalue().strip()
-    )  # because stdout is a StringIO instance
-    assert "Christiansen" in output
-    print(output)
+    assert "Christiansen" in context.response
 
 
 @then("git is installed")

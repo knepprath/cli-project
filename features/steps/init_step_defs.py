@@ -12,13 +12,10 @@ def step_impl(context):
 
 @then("an error message is displayed stating the directory already exits")
 def step_impl(context):
-    output = (
-        sys.stdout.getvalue().strip()
-    )  # because stdout is a StringIO instance
     assert (
-        "ERROR: Cannot create project. The directory already exits" in output
+        "ERROR: Cannot create project. The directory already exits"
+        in context.response
     )
-    print(output)
 
 
 @then(

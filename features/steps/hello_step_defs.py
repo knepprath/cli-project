@@ -1,21 +1,26 @@
-import sys
+import os
 from behave import *
-from klickbrick import klickbrick
+import subprocess
 
 
 @given("we run the hello command")
 def step_impl(context):
-    args = ["hello", "--name", "david"]
-    old_sys_argv = sys.argv
-    sys.argv = [old_sys_argv[0]] + args
-
-    klickbrick.KlickBrick()
+    process = subprocess.Popen(
+        [
+            "python3",
+            f"{os.getcwd()}/klickbrick/klickbrick.py",
+            "hello",
+            "--name",
+            "david",
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = process.communicate()
+    context.response = stdout.decode("utf-8")
 
 
 @then('the command returns "hello world"')
 def step_impl(context):
-    output = (
-        sys.stdout.getvalue().strip()
-    )  # because stdout is a StringIO instance
-    assert output == "Hello david"
-    print(output)
+    print(context.response)
+    assert "Hello david" in context.response

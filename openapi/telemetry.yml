@@ -4,14 +4,17 @@ info:
   title: KlickBrick CLI Telemetry
   description: 'This define the contract for the server which handles the CLI telemetry metrics'
   version: 1.0.0
+servers:
+  - url: https://my.api.com
 tags:
   - name: Telemetry
 paths:
-  /metric:
+  /metrics:
     post:
       tags:
         - metrics
       summary: Add a new CLI metric
+      operationId: app.post_metrics
       requestBody:
         description: Metric object that describes a users activity
         content:
@@ -20,9 +23,8 @@ paths:
               $ref: '#/components/schemas/Metrics'
         required: true
       responses:
-        405:
-          description: Invalid input
-          content: {}
+        '200':
+          description: OK
 components:
   schemas:
     Metrics:

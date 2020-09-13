@@ -1,12 +1,13 @@
+@skip
 Feature: Usage telemetry is reported to backend server
 
-  @skip
-  Scenario: CLI reports usage and context
+  Scenario: CLI emits metrics with usage and context
+    Given the server is running to receive CLI metrics
     When user executes a command with the CLI
-    Then the CLI reports the command
-    And the CLI reports the OS
-    And the CLI reports the Python version
-    And the CLI reports the user config
+    Then the metric is emitted contains the command
+    And the metric is emitted contains the OS
+    And the metric is emitted contains the Python version
+    And the metric is emitted contains the user config
 
   @skip
   Scenario: CLI Telemetry fails gracefully
