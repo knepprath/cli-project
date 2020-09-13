@@ -2,11 +2,12 @@ import unittest
 import sys
 
 from klickbrick import klickbrick
+from klickbrick import scripts
 
 
 class TestCLI(unittest.TestCase):
     def test_construct_greeting(self):
-        assert klickbrick.construct_greeting("david") == "Hello david"
+        assert scripts.construct_greeting("david") == "Hello david"
 
     def test_parse_args(self):
 
