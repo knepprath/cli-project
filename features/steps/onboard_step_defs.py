@@ -10,7 +10,7 @@ from klickbrick.shell import execute
 def step_impl(context, command):
     args = shlex.split(command)
     response_code, output = execute(
-        ["python3", f"{os.getcwd()}/klickbrick/klickbrick.py"] + args
+        ["python", f"{os.getcwd()}/klickbrick/klickbrick.py"] + args
     )
     print(output)
     context.response = output

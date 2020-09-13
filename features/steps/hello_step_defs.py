@@ -8,7 +8,7 @@ from klickbrick.shell import execute
 def step_impl(context):
     response_code, output = execute(
         [
-            "python3",
+            "python",
             f"{os.getcwd()}/klickbrick/klickbrick.py",
             "hello",
             "--name",
