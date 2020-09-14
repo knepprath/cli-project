@@ -26,7 +26,7 @@ class KlickBrick(object):
             "-v",
             "--version",
             action="version",
-            version="%(prog)s 2.0",
+            version=f"%(prog)s {scripts.package_version()}",
         )
 
         # TODO add scenario for invalid arg

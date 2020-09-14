@@ -1,17 +1,9 @@
 import os
-import shlex
+
 from behave import *
 from pathlib import Path
 
 from klickbrick.shell import execute
-
-
-@when("the user runs KlickBrick '{command}'")
-def step_impl(context, command):
-    args = shlex.split(command)
-    response_code, output = execute(["poetry", "run", "klickbrick"] + args)
-    print(output)
-    context.response = output
 
 
 @then("an onboarding checklist is generated")

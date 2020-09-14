@@ -1,6 +1,7 @@
 import sys
 import os
 from pathlib import Path
+import pkg_resources
 
 from klickbrick import brew
 from klickbrick import shell
@@ -8,6 +9,10 @@ from klickbrick import shell
 PYTHON_VERSION = "3.8.0"
 USER_HOME_DIRECTORY = str(Path.home())
 USER_CURRENT_WORKING_DIRECTORY = os.getcwd()
+
+
+def package_version():
+    return pkg_resources.get_distribution("klickbrick").version
 
 
 def construct_greeting(name):
