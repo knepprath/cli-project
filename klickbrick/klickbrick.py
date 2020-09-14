@@ -18,7 +18,19 @@ FRAMEWORKS = ["python"]
 class KlickBrick(object):
     def __init__(self):
         parser = argparse.ArgumentParser(prog="klickbrick")
-        parser.add_argument("invoke")
+        parser.add_argument(
+            "invoke", help="you must provide a valid subcommand"
+        )
+        # TODO add scenario to capture this --version
+        parser.add_argument(
+            "-v",
+            "--version",
+            action="version",
+            version="%(prog)s 2.0",
+        )
+
+        # TODO add scenario for invalid arg
+        # TODO if no arg print message accordingly and invoke help, add scenario for this too
 
         # send_metric(
         #     {
@@ -39,8 +51,8 @@ class KlickBrick(object):
         self.subcommand_args = sys.argv[1:]
 
         if not hasattr(self, subcommand.invoke):
-            print("Unrecognized command")
-            parser.print_help()
+            self.help()
+            # parser.print_help()
             exit(1)
         # use dispatch pattern to invoke method with same name
         getattr(self, subcommand.invoke)()
@@ -70,8 +82,8 @@ class KlickBrick(object):
             description="Record changes to the repository"
         )
         parser.add_argument(
-            "--name",
             "-n",
+            "--name",
             type=str,
             default="world",
             help="Optional flag to be more personal",
@@ -85,22 +97,22 @@ class KlickBrick(object):
             description="Initialize a new code repository according with standard conventions"
         )
         parser.add_argument(
-            "--name",
             "-n",
+            "--name",
             type=str,
             required=True,
             help="Name of the new code repository",
         )
         parser.add_argument(
-            "--path",
             "-p",
+            "--path",
             type=str,
             default=os.getcwd(),
             help="Path to location that the code repository should be created. Defaults to the current working directory",
         )
         parser.add_argument(
-            "--framework",
             "-f",
+            "--framework",
             type=str,
             default="python",
             help="Language framework that this code repository will use",
