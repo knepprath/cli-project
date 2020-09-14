@@ -19,9 +19,8 @@ class KlickBrick(object):
     def __init__(self):
         parser = argparse.ArgumentParser(prog="klickbrick")
         parser.add_argument(
-            "invoke", help="you must provide a valid subcommand"
+            "invoke", nargs="?", help="you must provide a valid subcommand"
         )
-        # TODO add scenario to capture this --version
         parser.add_argument(
             "-v",
             "--version",
@@ -50,24 +49,29 @@ class KlickBrick(object):
         subcommand = parser.parse_args(sys.argv[1:2])
         self.subcommand_args = sys.argv[1:]
 
-        if not hasattr(self, subcommand.invoke):
+        if not sys.argv[1:2]:
             self.help()
-            # parser.print_help()
-            exit(1)
-        # use dispatch pattern to invoke method with same name
-        getattr(self, subcommand.invoke)()
+        elif not hasattr(self, subcommand.invoke):
+            self.subcommand_args.append(subcommand.invoke)
+            self.help()
+        else:
+            # use dispatch pattern to invoke method with same name
+            getattr(self, subcommand.invoke)()
 
     def help(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument("help", help="Optional flag to be more personal")
-        parser.add_argument("name", nargs="?", help="Command to show help for")
+        parser.add_argument(
+            "help", nargs="?", help="show usage for subcommands"
+        )
+        parser.add_argument(
+            "subcommand",
+            nargs="?",
+            help="name of subcommand to show usage for",
+        )
         args = parser.parse_args(self.subcommand_args)
 
-        if args.name:
-            self.subcommand_args.append("-h")
-            getattr(self, args.name)()
-        else:
-            print("Use help [name] to show help for given command")
+        if args.subcommand is None:
+            parser.print_help()
             print("List of available commands:")
             print(
                 [
@@ -76,17 +80,28 @@ class KlickBrick(object):
                     if inspect.ismethod(getattr(self, attr))
                 ][1:]
             )
+        elif not hasattr(self, args.subcommand):
+            print(f"{args.subcommand} is invalid command")
+            print("List of available commands:")
+            print(
+                [
+                    attr
+                    for attr in dir(self)
+                    if inspect.ismethod(getattr(self, attr))
+                ][1:]
+            )
+        else:
+            self.subcommand_args.append("-h")
+            getattr(self, args.subcommand)()
 
     def hello(self):
-        parser = argparse.ArgumentParser(
-            description="Record changes to the repository"
-        )
+        parser = argparse.ArgumentParser(description="Hello World command")
         parser.add_argument(
             "-n",
             "--name",
             type=str,
             default="world",
-            help="Optional flag to be more personal",
+            help="optional flag to be more personal",
         )
 
         args = parser.parse_args(self.subcommand_args[1:])

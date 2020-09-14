@@ -4,6 +4,12 @@ Feature: Document usage of commands
     When the user runs KlickBrick 'help'
     Then list all available commands
 
-  Scenario: Document usage of specific command
+  Scenario: Usage for specific command
     When the user runs KlickBrick 'help hello'
     Then document the usage of the command
+
+  @skip
+  Scenario: Usage for non-existent command
+    When the user runs KlickBrick 'help nonexistent'
+    Then indicate that 'nonexistent' is an invalid command
+    And list all available commands

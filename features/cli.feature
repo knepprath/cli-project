@@ -15,7 +15,7 @@ Feature: Core Functionality of the CLI
     Then list all available commands
 
   @skip
-  Scenario: Executed with invalid command
-    When the user runs KlickBrick with an invalid command
+  Scenario: Executed with non-existent subcommand
+    When the user runs KlickBrick 'nonexistent'
     Then the command is identified as invalid
     And list all available commands
