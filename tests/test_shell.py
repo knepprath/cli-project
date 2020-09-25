@@ -22,14 +22,14 @@ class TestShell(unittest.TestCase):
         return_value_code, return_value_stdout = shell.execute(["foo"])
         stdout_output = sys.stdout.getvalue()
         self.assertTrue("Failed to execute" in stdout_output)
-        self.assertEqual(return_value_code, 2)
+        self.assertGreater(return_value_code, 0)
         self.assertTrue("No such file or directory" in return_value_stdout)
 
     def test_execute_sad_path_ls(self):
         return_value_code, return_value_stdout = shell.execute(["ls", "foo"])
         stdout_output = sys.stdout.getvalue()
         self.assertTrue("No such file or directory" in stdout_output)
-        self.assertEqual(return_value_code, 1)
+        self.assertGreater(return_value_code, 0)
         self.assertFalse(return_value_stdout)
 
 
