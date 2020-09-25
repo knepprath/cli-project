@@ -142,6 +142,7 @@ class KlickBrick(object):
                 f"the supported frameworks for the init command are {FRAMEWORKS}"
             )
 
+    # TODO we don't want this in the class because we don't want to treat it like an actual subcommand
     def init_python(self, parent, name):
         path = parent + "/" + name
         path = os.path.expanduser(path)

@@ -8,8 +8,7 @@ Feature: Document usage of commands
     When the user runs KlickBrick 'help hello'
     Then document the usage of the command
 
-  @skip
   Scenario: Usage for non-existent command
     When the user runs KlickBrick 'help nonexistent'
-    Then indicate that 'nonexistent' is an invalid command
+    Then the command is identified as invalid
     And list all available commands
