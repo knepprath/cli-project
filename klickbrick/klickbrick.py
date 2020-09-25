@@ -28,9 +28,7 @@ class KlickBrick(object):
             version=f"%(prog)s {scripts.package_version()}",
         )
 
-        # TODO add scenario for invalid arg
-        # TODO if no arg print message accordingly and invoke help, add scenario for this too
-
+        # TODO config to enable metrics
         # send_metric(
         #     {
         #         "userId": "DK",
