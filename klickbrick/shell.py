@@ -7,17 +7,14 @@ import urllib.request
 def execute(args):
     print(f"DEBUG : executing command {args}")
     try:
-        process = subprocess.Popen(
-            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        output = subprocess.run(args, capture_output=True)
     except FileNotFoundError as exception:
         print(f"DEBUG : Failed to execute {args}")
         return exception.errno, exception.strerror
-    stdout, stderr = process.communicate()
-    print(f"DEBUG : stdout: {stdout}")
-    if process.returncode != 0:
-        print(f"DEBUG : stderr: {stderr}")
-    return process.returncode, stdout.decode("utf-8")
+    print(f"DEBUG : stdout: {output.stdout}")
+    if output.returncode != 0:
+        print(f"DEBUG : stderr: {output.stderr}")
+    return output.returncode, output.stdout.decode("utf-8")
 
 
 def copy_file(source, destination):
