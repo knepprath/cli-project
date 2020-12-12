@@ -13,6 +13,10 @@ from klickbrick import scripts
 
 FRAMEWORKS = ["python"]
 
+# TODO if I make this global, how can I reference at low level helper functions. Env variable?
+# or I could create a globals module https://instructobit.com/tutorial/108/How-to-share-global-variables-between-files-in-Python
+DRY_RUN = False
+
 
 class KlickBrick(object):
     command_args = []
@@ -26,7 +30,7 @@ class KlickBrick(object):
             "-v",
             "--version",
             action="version",
-            version=f"klickbrick {scripts.package_version()}",
+            version=f"%(prog)s {scripts.package_version()}",
         )
         self.base_subparser.add_argument(
             "-d",
@@ -34,6 +38,12 @@ class KlickBrick(object):
             action="store_true",
             help="Inspect what the result of the command will be without any side effects",
         )
+
+        args, unknown = self.base_subparser.parse_known_args()
+        if args.dry_run is True:
+            global DRY_RUN
+            DRY_RUN = True
+
         self.subparsers = parser.add_subparsers()
 
         # TODO config to enable metrics
@@ -239,7 +249,7 @@ def send_metric(metric):
 
 
 def print_available_commands(cli):
-    print("List of available subcommands are:")
+    print("List of available commands are:")
     print(
         [attr for attr in dir(cli) if inspect.ismethod(getattr(cli, attr))][1:]
     )
