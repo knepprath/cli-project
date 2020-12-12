@@ -10,5 +10,10 @@ Feature: Document usage of commands
 
   Scenario: Usage for non-existent command
     When the user runs KlickBrick 'help nonexistent'
-    Then the command is identified as invalid
+    Then the argument is identified as invalid
+    And list all available commands
+
+  Scenario: Usage for invalid argument
+    When the user runs KlickBrick 'help --invalid'
+    Then the argument is identified as invalid
     And list all available commands

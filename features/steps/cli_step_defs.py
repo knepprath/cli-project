@@ -28,4 +28,4 @@ def step_impl(context):
 
 @then("the command is identified as invalid")
 def step_impl(context):
-    assert "nonexistent is invalid command" "" in context.response
+    assert "'nonexistent' is not a valid command" "" in context.response
