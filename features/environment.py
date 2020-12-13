@@ -2,6 +2,7 @@ from behave.tag_matcher import ActiveTagMatcher
 import os
 import sys
 import shutil
+from klickbrick import config
 
 # -- MATCHES ANY TAGS: @use.with_{category}={value}
 # NOTE: active_tag_value_provider provides category values for active tags.
@@ -19,6 +20,7 @@ def setup_active_tag_values(active_tag_values, data):
 
 
 def before_all(context):
+    config.initialize()
     # -- SETUP ACTIVE-TAG MATCHER (with userdata):
     # USE: behave -D browser=safari ...
     setup_active_tag_values(active_tag_value_provider, context.config.userdata)

@@ -1,4 +1,5 @@
 import subprocess
+
 import shutil
 import os
 import urllib.request
@@ -10,16 +11,18 @@ def execute(args):
     logging.debug(f"executing command {args}")
     if config.DRY_RUN:
         print(" ".join(args))
-        return 0, "dry run"
+        return 0, "Invoked using dry run"
     else:
         try:
-            output = subprocess.run(args, capture_output=True)
+            output = subprocess.run(
+                args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            )
         except FileNotFoundError as exception:
             logging.error(f"Failed to execute {args}")
             return exception.errno, exception.strerror
         logging.debug(f"stdout: {output.stdout}")
         if output.returncode != 0:
-            logging.error(f"stderr: {output.stderr}")
+            logging.error(f"stderr: {output.stdout}")
         return output.returncode, output.stdout.decode("utf-8")
 
 
@@ -42,4 +45,4 @@ def install_from_url(executor, url):
         logging.debug(f"Downloading installer from {url}")
         filename, headers = urllib.request.urlretrieve(url)
         logging.debug(f"Downloaded {filename} with headers {headers}")
-        return_code, output = execute([executor, filename])
+        execute([executor, filename])

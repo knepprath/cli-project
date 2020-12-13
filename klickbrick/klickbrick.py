@@ -173,7 +173,7 @@ class KlickBrick(object):
             )
             return
 
-        return_code, output = shell.execute(["git", "init", f"{path}"])
+        shell.execute(["git", "init", f"{path}"])
 
     def onboard(self):
         parser = self.subparsers.add_parser(
@@ -254,6 +254,7 @@ def print_available_commands(cli):
 
 # Entry point for poetry so package is executable
 def main():
+    # TODO Make log level configurable
     logging.basicConfig(level=logging.INFO)
     config.initialize()
     KlickBrick()
