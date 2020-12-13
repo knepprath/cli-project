@@ -5,6 +5,7 @@ import requests
 import inspect
 from pathlib import Path
 
+from klickbrick import config
 from klickbrick import shell
 from klickbrick import scripts
 
@@ -12,10 +13,6 @@ from klickbrick import scripts
 # TODO add proper logger
 
 FRAMEWORKS = ["python"]
-
-# TODO if I make this global, how can I reference at low level helper functions. Env variable?
-# or I could create a globals module https://instructobit.com/tutorial/108/How-to-share-global-variables-between-files-in-Python
-DRY_RUN = False
 
 
 class KlickBrick(object):
@@ -41,8 +38,7 @@ class KlickBrick(object):
 
         args, unknown = self.base_subparser.parse_known_args()
         if args.dry_run is True:
-            global DRY_RUN
-            DRY_RUN = True
+            config.DRY_RUN = True
 
         self.subparsers = parser.add_subparsers()
 
@@ -257,6 +253,7 @@ def print_available_commands(cli):
 
 # Entry point for poetry so package is executable
 def main():
+    config.initialize()
     KlickBrick()
 
 

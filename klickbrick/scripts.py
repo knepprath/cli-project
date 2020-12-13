@@ -56,15 +56,10 @@ def install_dev_tools(selection, first_name, last_name):
 
 
 def install_brew():
-    return_code, output = shell.execute(["brew", "--version"])
-
-    if return_code == 0:
-        print("WARNING : brew is already installed")
-    else:
-        shell.install_from_url(
-            executor="bash",
-            url="https://raw.githubusercontent.com/Homebrew/install/master/install.sh",
-        )
+    shell.install_from_url(
+        executor="bash",
+        url="https://raw.githubusercontent.com/Homebrew/install/master/install.sh",
+    )
 
 
 def configure_git(first_name, last_name):
