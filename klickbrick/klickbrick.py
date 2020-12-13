@@ -4,13 +4,13 @@ import os
 import requests
 import inspect
 from pathlib import Path
+import logging
 
 from klickbrick import config
 from klickbrick import shell
 from klickbrick import scripts
 
 # TODO optimize imports
-# TODO add proper logger
 
 FRAMEWORKS = ["python"]
 
@@ -38,6 +38,7 @@ class KlickBrick(object):
 
         args, unknown = self.base_subparser.parse_known_args()
         if args.dry_run is True:
+            logging.debug("Enabling dry run mode")
             config.DRY_RUN = True
 
         self.subparsers = parser.add_subparsers()
@@ -90,17 +91,17 @@ class KlickBrick(object):
         if args.help is None and args.command is None:
             print_available_commands(self)
         elif unknown:
-            print(f"'{unknown}' is not a valid argument")
+            logging.error(f"'{unknown}' is not a valid argument")
             parser.print_help()
             print_available_commands(self)
         elif args.help == "help" and args.command is None:
             parser.print_help()
             print_available_commands(self)
         elif "help" not in args.help:
-            print(f"'{args.help}' is not a valid command")
+            logging.error(f"'{args.help}' is not a valid command")
             print_available_commands(self)
         elif not hasattr(self, args.command):
-            print(f"{args.command} is not a valid argument")
+            logging.error(f"{args.command} is not a valid argument")
             print_available_commands(self)
         else:
             self.command_args.append("-h")
@@ -154,7 +155,7 @@ class KlickBrick(object):
         if args.framework in FRAMEWORKS:
             getattr(self, "init_" + args.framework)(args.path, args.name)
         else:
-            print(
+            logging.warning(
                 f"the supported frameworks for the init command are {FRAMEWORKS}"
             )
 
@@ -162,12 +163,12 @@ class KlickBrick(object):
     def init_python(self, parent, name):
         path = parent + "/" + name
         path = os.path.expanduser(path)
-        print(f"creating python project at {path}")
+        logging.info(f"creating python project at {path}")
 
         try:
             Path(path).mkdir(parents=True)
         except FileExistsError:
-            print(
+            logging.error(
                 f"ERROR: Cannot create project. The directory already exits: {path}"
             )
             return
@@ -207,21 +208,21 @@ class KlickBrick(object):
         args = parser.parse_args(self.command_args[1:])
 
         if args.checklist is True:
-            print("creating checklist")
+            logging.info("creating checklist")
             scripts.write_checklist()
         # All other options require additional flags
         elif args.first_name is not None and args.last_name is not None:
             if args.it_request is True:
-                print("submitting it request")
+                logging.info("submitting it request")
                 scripts.send_it_email(args.first_name, args.last_name)
             elif args.dev_tools is not False:
-                print("installing dev tools")
+                logging.info("installing dev tools")
                 scripts.install_dev_tools(
                     args.dev_tools, args.first_name, args.last_name
                 )
             else:
                 # TODO better algo to solve this so it's more maintainable
-                print(
+                logging.info(
                     "creating checklist, submitting it request, and installing dev tools"
                 )
                 scripts.write_checklist()
@@ -230,7 +231,7 @@ class KlickBrick(object):
                     True, args.first_name, args.last_name
                 )
         else:
-            print("missing required args")
+            logging.error("missing required args")
 
 
 def send_metric(metric):
@@ -241,7 +242,7 @@ def send_metric(metric):
             "http://localhost:8080/metrics", json=payload, timeout=2000
         )
     except requests.exceptions.Timeout as ex:
-        print(str(ex))
+        logging.error(str(ex))
 
 
 def print_available_commands(cli):
@@ -253,6 +254,7 @@ def print_available_commands(cli):
 
 # Entry point for poetry so package is executable
 def main():
+    logging.basicConfig(level=logging.INFO)
     config.initialize()
     KlickBrick()
 
