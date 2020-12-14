@@ -121,13 +121,3 @@ def configure_poetry_repository():
     shell.execute(
         f"{USER_HOME_DIRECTORY}/.poetry/bin/poetry config repositories.klickbrick https://klick.brick/simple/"
     )
-
-
-def init_python(parent, name):
-    path = parent + "/" + name
-    path = os.path.expanduser(path)
-    logging.info(f"creating python project at '{path}'")
-    shell.create_directory(path)
-
-    logging.info(f"initializing the directory '{path}' as a git repo")
-    shell.execute(f"git init {path}")

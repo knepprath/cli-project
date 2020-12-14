@@ -18,12 +18,7 @@ class KlickBrick(object):
         parser = argparse.ArgumentParser(prog="klickbrick")
         # Create base subparser so parsers can consume it as parent and share common arguments
         self.base_subparser = argparse.ArgumentParser(add_help=False)
-        self.base_subparser.add_argument(
-            "-v",
-            "--version",
-            action="version",
-            version=f"%(prog)s {scripts.package_version()}",
-        )
+
         self.base_subparser.add_argument(
             "-d",
             "--dry-run",
@@ -37,22 +32,6 @@ class KlickBrick(object):
             config.DRY_RUN = True
 
         self.subparsers = parser.add_subparsers()
-
-        # TODO config to enable metrics
-        # send_metric(
-        #     {
-        #         "userId": "DK",
-        #         "osPlatform": "mac os x",
-        #         "osVersion": "10.15.6",
-        #         "pythonVersion": "3.8.9",
-        #         "command": {
-        #             "input": " ".join(arguments[1:]),
-        #             "exitReason": "blah",
-        #             "exitCode": "0",
-        #             "duration": "0m0.001s",
-        #         },
-        #     }
-        # )
 
         # handle no arguments
         if len(arguments) == 0:
@@ -119,41 +98,6 @@ class KlickBrick(object):
         args = parser.parse_args(arguments[1:])
         print(scripts.construct_greeting(args.name))
 
-    def init(self, arguments):
-        parser = self.__create_parser(
-            "init",
-            "Initialize a new code repository with standard conventions",
-        )
-        parser.add_argument(
-            "-p",
-            "--path",
-            type=str,
-            default=os.getcwd(),
-            help="Path to location that the code repository should be created. Defaults to the current working directory",
-        )
-        parser.add_argument(
-            "-f",
-            "--framework",
-            type=str,
-            default="python",
-            help="Language framework that this code repository will use",
-        )
-        required_arguments = parser.add_argument_group("required arguments")
-        required_arguments.add_argument(
-            "-n",
-            "--name",
-            type=str,
-            required=True,
-            help="Name of the new code repository",
-        )
-
-        args = parser.parse_args(arguments[1:])
-
-        if "python" in args.framework:
-            scripts.init_python(args.path, args.name)
-        else:
-            logging.warning(f"Python is currently the only supported language")
-
     def onboard(self, arguments):
         parser = self.__create_parser(
             "onboard",
@@ -218,17 +162,6 @@ class KlickBrick(object):
             description=description,
         )
         return parser
-
-
-def send_metric(metric):
-    payload = {"metrics": [metric]}
-
-    try:
-        requests.post(
-            "http://localhost:8080/metrics", json=payload, timeout=2000
-        )
-    except requests.exceptions.Timeout as ex:
-        logging.error(str(ex))
 
 
 def print_available_commands(cli):
