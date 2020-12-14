@@ -16,7 +16,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 class KlickBrick(object):
     def __init__(self, arguments):
         parser = argparse.ArgumentParser(prog="klickbrick")
-        # Create base_subparser so subparsers can consume as parent and share common arguments
+        # Create base subparser so parsers can consume it as parent and share common arguments
         self.base_subparser = argparse.ArgumentParser(add_help=False)
         self.base_subparser.add_argument(
             "-v",
@@ -59,19 +59,19 @@ class KlickBrick(object):
             self.help(arguments)
         else:
             command = arguments[0]
-            # handle undefined arguments
+            # handle undefined command
             if not hasattr(self, command):
                 self.help(arguments)
             else:
                 # use dispatch pattern to invoke method with same name so it's easy to add new subcommands
                 getattr(self, command)(arguments)
 
-    # acknowladge the tradoff in my design here. I'm optimizing for it to be very easy to add new commands
-    # that means I'm working a little bit against the built in help functinoality that is targeting a more straightforward approach.
-    # But I still want a really robust help command. This is something that I build once, but new commands will be added more frequently.
+    # Design Decision Tradeoff
+    # Optimizing for being easy to add new commands but with robust help functionality.
+    # Augmenting the default help adds one time complexity, but all new commands will benefit.
     def help(self, arguments):
-        parser = self.subparsers.add_parser(
-            "help", parents=[self.base_subparser], add_help=False
+        parser = self.__create_parser(
+            "help", "Instructions for using the klickbrick CLI"
         )
         parser.add_argument("help", nargs="?", help=argparse.SUPPRESS)
         parser.add_argument(
@@ -80,6 +80,7 @@ class KlickBrick(object):
             help="name of command to show usage for",
         )
 
+        # Handle unknown arguments
         args, unknown = parser.parse_known_args(arguments)
 
         if args.help is None and args.command is None:
@@ -101,30 +102,27 @@ class KlickBrick(object):
             arguments.append("-h")
             try:
                 getattr(self, args.command)(arguments)
-            # TODO Because I am augmenting argparse help I don't want argparse to do system exit as this breaks ability to test
+            # TODO Because I am augmenting the built in help I don't want argparse to do system exit as this breaks ability to test
             # Consider a better solution https://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overriding-the-exit-status-code
             except SystemExit:
                 pass
 
     def hello(self, arguments):
-        parser = self.subparsers.add_parser(
-            "hello", parents=[self.base_subparser]
-        )
+        parser = self.__create_parser("hello", "A friendly Hello World")
         parser.add_argument(
             "-n",
             "--name",
             type=str,
             default="world",
-            help="optional flag to be more personal",
+            help="Optional flag to be more friendly",
         )
         args = parser.parse_args(arguments[1:])
         print(scripts.construct_greeting(args.name))
 
     def init(self, arguments):
-        parser = self.subparsers.add_parser(
+        parser = self.__create_parser(
             "init",
-            parents=[self.base_subparser],
-            description="Initialize a new code repository with standard conventions",
+            "Initialize a new code repository with standard conventions",
         )
         parser.add_argument(
             "-p",
@@ -157,10 +155,9 @@ class KlickBrick(object):
             logging.warning(f"Python is currently the only supported language")
 
     def onboard(self, arguments):
-        parser = self.subparsers.add_parser(
+        parser = self.__create_parser(
             "onboard",
-            parents=[self.base_subparser],
-            description="Installs and configures all software needed by new developers",
+            "Installs and configures all software needed by new developers",
         )
         parser.add_argument(
             "--checklist",
@@ -192,6 +189,7 @@ class KlickBrick(object):
             logging.info("creating checklist")
             scripts.write_checklist()
         # All other options require additional flags
+        # TODO refactor to be more maintainable
         elif args.first_name is not None and args.last_name is not None:
             if args.it_request is True:
                 logging.info("submitting it request")
@@ -202,7 +200,6 @@ class KlickBrick(object):
                     args.dev_tools, args.first_name, args.last_name
                 )
             else:
-                # TODO better algo to solve this so it's more maintainable
                 logging.info(
                     "creating checklist, submitting it request, and installing dev tools"
                 )
@@ -213,6 +210,14 @@ class KlickBrick(object):
                 )
         else:
             logging.error("missing required args")
+
+    def __create_parser(self, name, description):
+        parser = self.subparsers.add_parser(
+            name=name,
+            parents=[self.base_subparser],
+            description=description,
+        )
+        return parser
 
 
 def send_metric(metric):
