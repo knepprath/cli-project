@@ -12,3 +12,8 @@ def step_impl(context):
 @then(u"document the usage of the command")
 def step_impl(context):
     assert "show this help message and exit" in context.response
+
+
+@then("the argument is identified as invalid")
+def step_impl(context):
+    assert "is not a valid argument" "" in context.response

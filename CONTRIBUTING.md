@@ -8,6 +8,11 @@ To install dependencies for development, run:
 poetry install 
 ```
 
+To run locally:
+```
+poety run klickbrick help
+```
+
 ## Testing
 Use Make to run tests
 
