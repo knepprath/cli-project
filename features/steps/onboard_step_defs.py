@@ -10,7 +10,12 @@ def step_impl(context):
 
 @then("the checklist is in Markdown format")
 def step_impl(context):
-    assert os.path.isfile("onboarding_checklist.md")
+    assert (
+        f"cp onboard_checklist_template.md {os.getcwd()}/onboarding_checklist.md"
+        in context.response
+    )
+    # end-to-end with side effects
+    # assert os.path.isfile("onboarding_checklist.md")
 
 
 @then("an IT onboarding request has been created")
