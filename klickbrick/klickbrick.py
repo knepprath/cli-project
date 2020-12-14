@@ -4,8 +4,6 @@ import os
 import inspect
 import logging
 
-import requests
-
 from klickbrick import config
 from klickbrick import scripts
 
@@ -37,22 +35,6 @@ class KlickBrick(object):
             config.DRY_RUN = True
 
         self.subparsers = parser.add_subparsers()
-
-        # TODO config to enable metrics
-        # send_metric(
-        #     {
-        #         "userId": "DK",
-        #         "osPlatform": "mac os x",
-        #         "osVersion": "10.15.6",
-        #         "pythonVersion": "3.8.9",
-        #         "command": {
-        #             "input": " ".join(arguments[1:]),
-        #             "exitReason": "blah",
-        #             "exitCode": "0",
-        #             "duration": "0m0.001s",
-        #         },
-        #     }
-        # )
 
         # handle no arguments
         if len(arguments) == 0:
@@ -218,17 +200,6 @@ class KlickBrick(object):
             description=description,
         )
         return parser
-
-
-def send_metric(metric):
-    payload = {"metrics": [metric]}
-
-    try:
-        requests.post(
-            "http://localhost:8080/metrics", json=payload, timeout=2000
-        )
-    except requests.exceptions.Timeout as ex:
-        logging.error(str(ex))
 
 
 def print_available_commands(cli):
