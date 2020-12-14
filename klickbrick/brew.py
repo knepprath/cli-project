@@ -1,5 +1,6 @@
-from klickbrick import shell
 import logging
+
+from klickbrick import shell
 
 
 def install(package_name):

@@ -1,14 +1,13 @@
 import argparse
 import sys
 import os
-import requests
 import inspect
 import logging
 
+import requests
+
 from klickbrick import config
 from klickbrick import scripts
-
-# TODO optimize imports
 
 # TODO Make log level configurable
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)

@@ -1,7 +1,9 @@
-from behave.tag_matcher import ActiveTagMatcher
 import os
 import sys
 import shutil
+
+from behave.tag_matcher import ActiveTagMatcher
+
 from klickbrick import config
 
 # -- MATCHES ANY TAGS: @use.with_{category}={value}

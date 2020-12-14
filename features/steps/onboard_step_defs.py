@@ -1,6 +1,7 @@
 import os
-from behave import *
 from pathlib import Path
+
+from behave import *
 
 
 @then("an onboarding checklist is generated")

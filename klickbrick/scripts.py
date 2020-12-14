@@ -1,7 +1,7 @@
+import logging
 import os
 from pathlib import Path
 import pkg_resources
-import logging
 
 from klickbrick import brew
 from klickbrick import shell

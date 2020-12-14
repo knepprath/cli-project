@@ -1,6 +1,7 @@
-from behave import *
 import os
 from pathlib import Path
+
+from behave import *
 
 
 @given("a directory already exists at '~/custom/path/new-project'")
