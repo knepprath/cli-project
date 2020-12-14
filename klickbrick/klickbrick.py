@@ -14,10 +14,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 class KlickBrick(object):
-    command_args = []
-
     def __init__(self, arguments):
-        self.arguments = arguments
         parser = argparse.ArgumentParser(prog="klickbrick")
         # Create base_subparser so subparsers can consume as parent and share common arguments
         self.base_subparser = argparse.ArgumentParser(add_help=False)
@@ -34,7 +31,7 @@ class KlickBrick(object):
             help="Inspect what the result of the command will be without any side effects",
         )
 
-        args, unknown = self.base_subparser.parse_known_args(self.arguments)
+        args, unknown = self.base_subparser.parse_known_args(arguments)
         if args.dry_run is True:
             logging.debug("Enabling dry run mode")
             config.DRY_RUN = True
@@ -59,21 +56,20 @@ class KlickBrick(object):
 
         # handle no arguments
         if len(arguments) == 0:
-            self.help()
+            self.help(arguments)
         else:
             command = arguments[0]
-            self.command_args = arguments[1:]
             # handle undefined arguments
             if not hasattr(self, command):
-                self.help()
+                self.help(arguments)
             else:
                 # use dispatch pattern to invoke method with same name so it's easy to add new subcommands
-                getattr(self, command)()
+                getattr(self, command)(arguments)
 
     # acknowladge the tradoff in my design here. I'm optimizing for it to be very easy to add new commands
     # that means I'm working a little bit against the built in help functinoality that is targeting a more straightforward approach.
     # But I still want a really robust help command. This is something that I build once, but new commands will be added more frequently.
-    def help(self):
+    def help(self, arguments):
         parser = self.subparsers.add_parser(
             "help", parents=[self.base_subparser], add_help=False
         )
@@ -84,7 +80,7 @@ class KlickBrick(object):
             help="name of command to show usage for",
         )
 
-        args, unknown = parser.parse_known_args(self.arguments)
+        args, unknown = parser.parse_known_args(arguments)
 
         if args.help is None and args.command is None:
             print_available_commands(self)
@@ -102,15 +98,15 @@ class KlickBrick(object):
             logging.error(f"'{args.command}' is not a valid argument")
             print_available_commands(self)
         else:
-            self.command_args.append("-h")
+            arguments.append("-h")
             try:
-                getattr(self, args.command)()
+                getattr(self, args.command)(arguments)
             # TODO Because I am augmenting argparse help I don't want argparse to do system exit as this breaks ability to test
             # Consider a better solution https://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overriding-the-exit-status-code
             except SystemExit:
                 pass
 
-    def hello(self):
+    def hello(self, arguments):
         parser = self.subparsers.add_parser(
             "hello", parents=[self.base_subparser]
         )
@@ -121,10 +117,10 @@ class KlickBrick(object):
             default="world",
             help="optional flag to be more personal",
         )
-        args = parser.parse_args(self.command_args)
+        args = parser.parse_args(arguments[1:])
         print(scripts.construct_greeting(args.name))
 
-    def init(self):
+    def init(self, arguments):
         parser = self.subparsers.add_parser(
             "init",
             parents=[self.base_subparser],
@@ -153,14 +149,14 @@ class KlickBrick(object):
             help="Name of the new code repository",
         )
 
-        args = parser.parse_args(self.command_args)
+        args = parser.parse_args(arguments[1:])
 
         if "python" in args.framework:
             scripts.init_python(args.path, args.name)
         else:
             logging.warning(f"Python is currently the only supported language")
 
-    def onboard(self):
+    def onboard(self, arguments):
         parser = self.subparsers.add_parser(
             "onboard",
             parents=[self.base_subparser],
@@ -190,7 +186,7 @@ class KlickBrick(object):
         required_arguments.add_argument("--first-name")
         required_arguments.add_argument("--last-name")
 
-        args = parser.parse_args(self.command_args)
+        args = parser.parse_args(arguments[1:])
 
         if args.checklist is True:
             logging.info("creating checklist")
