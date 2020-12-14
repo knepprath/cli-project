@@ -1,9 +1,6 @@
 import os
-
 from behave import *
 from pathlib import Path
-
-from klickbrick.shell import execute
 
 
 @then("an onboarding checklist is generated")
@@ -23,57 +20,72 @@ def step_impl(context):
 
 @then("git is installed")
 def step_impl(context):
-    response_code, output = execute(["git", "--version"])
-    assert response_code == 0
-    assert "git version" in output
+    assert "brew install git" in context.response
+    # end-to-end with side effects
+    # response_code, output = execute("git --version")
+    # assert response_code == 0
+    # assert "git version" in output
 
 
 @then("git user profile is set with users name")
 def step_impl(context):
-    response_code, output = execute(["git", "config", "--global", "user.name"])
-    assert response_code == 0
-    assert "Ole Kirk Christiansen" in output
+    assert "git config --global user.name Ole Christiansen" in context.response
+    # end-to-end with side effects
+    # response_code, output = execute("git config --global user.name")
+    # assert response_code == 0
+    # assert "Ole Christiansen" in output
 
 
 @then("git commit template is configured")
 def step_impl(context):
-    response_code, output = execute(
-        ["git", "config", "--global", "commit.template"]
+    assert (
+        "git config --global commit.template /Users/davidknepprath/.gitmessage"
+        in context.response
     )
-    assert response_code == 0
-    assert ".gitmessage" in output
+    # end-to-end with side effects
+    # response_code, output = execute("git config --global commit.template")
+    # assert response_code == 0
+    # assert ".gitmessage" in output
 
 
 @then("pyenv is installed")
 def step_impl(context):
-    response_code, output = execute(["pyenv", "versions"])
-    assert response_code == 0
+    assert "brew install pyenv" in context.response
+    # end-to-end with side effects
+    # response_code, output = execute("pyenv versions")
+    # assert response_code == 0
 
 
 @then("Python version 3.8.0 is set as Global default")
 def step_impl(context):
-    response_code, output = execute(["pyenv", "global"])
-    assert response_code == 0
-    assert "3.8.0" in output
+    assert "pyenv install --skip-existing 3.8.0" in context.response
+    # end-to-end with side effects
+    # response_code, output = execute("pyenv global")
+    # assert response_code == 0
+    # assert "3.8.0" in output
 
 
 @then("poetry is installed")
 def step_impl(context):
-    response_code, output = execute([f"{str(Path.home())}/.poetry/bin/poetry"])
-    assert response_code == 0
+    assert (
+        'python -c "$(curl -fsSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py)" --yes --no-modify-path'
+        in context.response
+    )
+    # end-to-end with side effects
+    # response_code, output = execute(f"{str(Path.home())}/.poetry/bin/poetry")
+    # assert response_code == 0
 
 
 @then("the KlickBrick repository is configured")
 def step_impl(context):
-    response_code, output = execute(
-        [
-            f"{str(Path.home())}/.poetry/bin/poetry",
-            "config",
-            "repositories.klickbrick",
-        ]
+    assert (
+        f"{str(Path.home())}/.poetry/bin/poetry config repositories.klickbrick https://klick.brick/simple/"
+        in context.response
     )
-    assert response_code == 0
-    assert "klick.brick" in output
+    # end-to-end with side effects
+    # response_code, output = execute(f"{str(Path.home())}/.poetry/bin/poetry config repositories.klickbrick")
+    # assert response_code == 0
+    # assert "klick.brick" in output
 
 
 @then("git is installed and configured")

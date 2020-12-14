@@ -46,7 +46,7 @@ def copy_file(source, destination):
 def install_from_url(executor, url, args=""):
     logging.debug(f"downloading from {url} and executing with {executor}")
     if config.DRY_RUN:
-        print(f'/bin/{executor} -c "$(curl -fsSL {url})" {args}')
+        print(f'{executor} -c "$(curl -fsSL {url})" {args}')
         return 0
     else:
         logging.debug(f"Downloading installer from {url}")
@@ -57,16 +57,17 @@ def install_from_url(executor, url, args=""):
 
 def create_directory(path):
     logging.debug(f"creating the directory {path}")
-    if config.DRY_RUN:
-        print(f"mkdir -p {path}")
-        return 0
+
+    if os.path.isdir(path):
+        logging.error(
+            f"Cannot create project. The directory already exits: {path}"
+        )
     else:
-        try:
+        if config.DRY_RUN:
+            print(f"mkdir -p {path}")
+            return 0
+        else:
             Path(path).mkdir(parents=True)
-        except FileExistsError:
-            logging.error(
-                f"ERROR: Cannot create project. The directory already exits: {path}"
-            )
 
 
 def append_to_file(path, content):

@@ -10,7 +10,7 @@ Feature: Initialize a code repository for a new project
     Then a directory called 'new-project' is created in '~/custom/path'
 
   Scenario: Specify the path for new project which already exits
-    Given a directory already exits at '~/custom/path/new-project'
+    Given a directory already exists at '~/custom/path/new-project'
     When the user runs KlickBrick 'init --name new-project --path ~/custom/path'
     Then an error message is displayed stating the directory already exits
 

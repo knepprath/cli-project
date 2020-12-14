@@ -7,7 +7,7 @@ from klickbrick import config
 # -- MATCHES ANY TAGS: @use.with_{category}={value}
 # NOTE: active_tag_value_provider provides category values for active tags.
 active_tag_value_provider = {
-    "os": sys.platform,  # To support scenarios that can only be run on macOS
+    "os": sys.platform,  # e.g. for scenario that can only be run on macOS tag with @use.with_os=darwin
 }
 print(sys.platform)
 active_tag_matcher = ActiveTagMatcher(active_tag_value_provider)
@@ -22,7 +22,7 @@ def setup_active_tag_values(active_tag_values, data):
 def before_all(context):
     config.initialize()
     # -- SETUP ACTIVE-TAG MATCHER (with userdata):
-    # USE: behave -D browser=safari ...
+    # USE: behave -D with_os=darwin ...
     setup_active_tag_values(active_tag_value_provider, context.config.userdata)
 
 

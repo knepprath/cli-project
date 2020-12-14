@@ -58,7 +58,7 @@ def install_dev_tools(selection, first_name, last_name):
 def install_brew():
     logging.info("Installing Brew")
     shell.install_from_url(
-        executor="bash",
+        executor="/bin/bash",
         url="https://raw.githubusercontent.com/Homebrew/install/master/install.sh",
     )
 
