@@ -44,7 +44,7 @@ def step_impl(context):
 @then("git commit template is configured")
 def step_impl(context):
     assert (
-        "git config --global commit.template /Users/davidknepprath/.gitmessage"
+        f"git config --global commit.template {str(Path.home())}/.gitmessage"
         in context.response
     )
     # end-to-end with side effects
