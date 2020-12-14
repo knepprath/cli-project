@@ -3,24 +3,23 @@ import sys
 import os
 import requests
 import inspect
-from pathlib import Path
 import logging
 
 from klickbrick import config
-from klickbrick import shell
 from klickbrick import scripts
 
 # TODO optimize imports
 
-FRAMEWORKS = ["python"]
+# TODO Make log level configurable
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 class KlickBrick(object):
     command_args = []
 
-    def __init__(self):
+    def __init__(self, arguments):
+        self.arguments = arguments
         parser = argparse.ArgumentParser(prog="klickbrick")
-
         # Create base_subparser so subparsers can consume as parent and share common arguments
         self.base_subparser = argparse.ArgumentParser(add_help=False)
         self.base_subparser.add_argument(
@@ -36,7 +35,7 @@ class KlickBrick(object):
             help="Inspect what the result of the command will be without any side effects",
         )
 
-        args, unknown = self.base_subparser.parse_known_args()
+        args, unknown = self.base_subparser.parse_known_args(self.arguments)
         if args.dry_run is True:
             logging.debug("Enabling dry run mode")
             config.DRY_RUN = True
@@ -51,7 +50,7 @@ class KlickBrick(object):
         #         "osVersion": "10.15.6",
         #         "pythonVersion": "3.8.9",
         #         "command": {
-        #             "input": " ".join(sys.argv[1:]),
+        #             "input": " ".join(arguments[1:]),
         #             "exitReason": "blah",
         #             "exitCode": "0",
         #             "duration": "0m0.001s",
@@ -60,11 +59,11 @@ class KlickBrick(object):
         # )
 
         # handle no arguments
-        if len(sys.argv) <= 1:
+        if len(arguments) == 0:
             self.help()
         else:
-            command = sys.argv[1]
-            self.command_args = sys.argv[1:]
+            command = arguments[0]
+            self.command_args = arguments[1:]
             # handle undefined arguments
             if not hasattr(self, command):
                 self.help()
@@ -86,7 +85,7 @@ class KlickBrick(object):
             help="name of command to show usage for",
         )
 
-        args, unknown = parser.parse_known_args()
+        args, unknown = parser.parse_known_args(self.arguments)
 
         if args.help is None and args.command is None:
             print_available_commands(self)
@@ -101,11 +100,16 @@ class KlickBrick(object):
             logging.error(f"'{args.help}' is not a valid command")
             print_available_commands(self)
         elif not hasattr(self, args.command):
-            logging.error(f"{args.command} is not a valid argument")
+            logging.error(f"'{args.command}' is not a valid argument")
             print_available_commands(self)
         else:
             self.command_args.append("-h")
-            getattr(self, args.command)()
+            try:
+                getattr(self, args.command)()
+            # TODO Because I am augmenting argparse help I don't want argparse to do system exit as this breaks ability to test
+            # Consider a better solution https://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overriding-the-exit-status-code
+            except SystemExit:
+                pass
 
     def hello(self):
         parser = self.subparsers.add_parser(
@@ -118,7 +122,7 @@ class KlickBrick(object):
             default="world",
             help="optional flag to be more personal",
         )
-        args = parser.parse_args(self.command_args[1:])
+        args = parser.parse_args(self.command_args)
         print(scripts.construct_greeting(args.name))
 
     def init(self):
@@ -150,30 +154,12 @@ class KlickBrick(object):
             help="Name of the new code repository",
         )
 
-        args = parser.parse_args(self.command_args[1:])
+        args = parser.parse_args(self.command_args)
 
-        if args.framework in FRAMEWORKS:
-            getattr(self, "init_" + args.framework)(args.path, args.name)
+        if "python" in args.framework:
+            scripts.init_python(args.path, args.name)
         else:
-            logging.warning(
-                f"the supported frameworks for the init command are {FRAMEWORKS}"
-            )
-
-    # TODO we don't want this in the class because we don't want to treat it like an actual subcommand
-    def init_python(self, parent, name):
-        path = parent + "/" + name
-        path = os.path.expanduser(path)
-        logging.info(f"creating python project at {path}")
-
-        try:
-            Path(path).mkdir(parents=True)
-        except FileExistsError:
-            logging.error(
-                f"ERROR: Cannot create project. The directory already exits: {path}"
-            )
-            return
-
-        shell.execute(["git", "init", f"{path}"])
+            logging.warning(f"Python is currently the only supported language")
 
     def onboard(self):
         parser = self.subparsers.add_parser(
@@ -205,7 +191,7 @@ class KlickBrick(object):
         required_arguments.add_argument("--first-name")
         required_arguments.add_argument("--last-name")
 
-        args = parser.parse_args(self.command_args[1:])
+        args = parser.parse_args(self.command_args)
 
         if args.checklist is True:
             logging.info("creating checklist")
@@ -254,10 +240,8 @@ def print_available_commands(cli):
 
 # Entry point for poetry so package is executable
 def main():
-    # TODO Make log level configurable
-    logging.basicConfig(level=logging.INFO)
     config.initialize()
-    KlickBrick()
+    KlickBrick(sys.argv[1:])
 
 
 # Support invoking the script directly from source

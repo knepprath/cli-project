@@ -1,4 +1,5 @@
 import subprocess
+from pathlib import Path
 
 import shutil
 import os
@@ -8,14 +9,18 @@ from klickbrick import config
 
 
 def execute(args):
-    logging.debug(f"executing command {args}")
+    logging.debug(f"executing command `{args}`")
     if config.DRY_RUN:
-        print(" ".join(args))
+        print(args)
         return 0, "Invoked using dry run"
     else:
         try:
             output = subprocess.run(
-                args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+                args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                shell=True,
+                executable="/bin/bash",
             )
         except FileNotFoundError as exception:
             logging.error(f"Failed to execute {args}")
@@ -27,6 +32,7 @@ def execute(args):
 
 
 def copy_file(source, destination):
+    logging.debug(f"copying {source} to {destination}")
     if config.DRY_RUN:
         print(f"cp {source} {destination}")
         return 0
@@ -37,12 +43,37 @@ def copy_file(source, destination):
         )
 
 
-def install_from_url(executor, url):
+def install_from_url(executor, url, args=""):
+    logging.debug(f"downloading from {url} and executing with {executor}")
     if config.DRY_RUN:
-        print(f'/bin/{executor} -c "$(curl -fsSL {url})"')
+        print(f'/bin/{executor} -c "$(curl -fsSL {url})" {args}')
         return 0
     else:
         logging.debug(f"Downloading installer from {url}")
         filename, headers = urllib.request.urlretrieve(url)
         logging.debug(f"Downloaded {filename} with headers {headers}")
-        execute([executor, filename])
+        execute(f"{executor} {filename} {args}")
+
+
+def create_directory(path):
+    logging.debug(f"creating the directory {path}")
+    if config.DRY_RUN:
+        print(f"mkdir -p {path}")
+        return 0
+    else:
+        try:
+            Path(path).mkdir(parents=True)
+        except FileExistsError:
+            logging.error(
+                f"ERROR: Cannot create project. The directory already exits: {path}"
+            )
+
+
+def append_to_file(path, content):
+    logging.debug(f"append to {path} the following content: {content}")
+    if config.DRY_RUN:
+        print(f"echo {content} >> {path}")
+        return 0
+    else:
+        with open(path, "a") as file:
+            file.write(content)

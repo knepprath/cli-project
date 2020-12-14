@@ -7,22 +7,18 @@ from klickbrick import scripts
 
 class TestCLI(unittest.TestCase):
     def test_construct_greeting(self):
-        assert scripts.construct_greeting("david") == "Hello david"
+        assert scripts.construct_greeting("Ole") == "Hello Ole"
 
     def test_parse_args(self):
-
-        args = ["hello", "--name", "david"]
-        old_sys_argv = sys.argv
-        sys.argv = [old_sys_argv[0]] + args
-
-        klickbrick.KlickBrick()
+        args = ["hello", "--name", "Ole"]
+        klickbrick.KlickBrick(args)
 
         if not hasattr(sys.stdout, "getvalue"):
             self.fail("need to run in buffered mode")
         output = (
             sys.stdout.getvalue().strip()
         )  # because stdout is a StringIO instance
-        self.assertEquals(output, "Hello david")
+        self.assertEquals(output, "Hello Ole")
 
 
 if __name__ == "__main__":
