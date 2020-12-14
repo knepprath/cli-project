@@ -123,11 +123,78 @@ def configure_poetry_repository():
     )
 
 
-def init_python(parent, name):
-    path = parent + "/" + name
-    path = os.path.expanduser(path)
-    logging.info(f"creating python project at '{path}'")
+def init_generic(parent, name):
+    path = construct_project_path(parent, name)
+    logging.info(f"creating project at `{path}`")
     shell.create_directory(path)
+
+    logging.info(f"add .gitignore config at `{path}`")
+    shell.copy_file(
+        source="init/gitignore_config",
+        destination=f"{path}/.gitignore",
+    )
+
+    logging.info(f"add README from template at `{path}`")
+    with open(
+        f"{os.path.dirname(os.path.abspath(__file__))}/resources/init/readme_template"
+    ) as file:
+        readme_content = file.read()
+    readme_content = readme_content.format(name)
+    shell.append_to_file(f"{path}/README", readme_content)
+
+    logging.info(f"add generic .travis.yml at `{path}`")
+    shell.copy_file(
+        source="init/travis_template",
+        destination=f"{path}/.travis.yml",
+    )
+
+    logging.info(f"creating a features directory for BDD process at `{path}`")
+    shell.create_directory(f"{path}/features/steps")
+
+
+def init_python(parent, name):
+    path = construct_project_path(parent, name)
+
+    logging.info(f"creating .python-version file in '{path}'")
+    shell.execute(f"( cd {path} ; pyenv local {PYTHON_VERSION} )")
 
     logging.info(f"initializing the directory '{path}' as a git repo")
     shell.execute(f"git init {path}")
+
+    logging.info(f"creating pyproject.toml with poetry")
+    # TODO define standard dependencies in configuration file
+    shell.execute(
+        f"( cd {path} ; poetry init --name {name} --python {PYTHON_VERSION} --dev-dependency pre-commit:2.7 --dev-dependency behave:1.2 )"
+    )
+
+    logging.info(f"add standard black formatting config to pyproject.toml")
+    with open(
+        f"{os.path.dirname(os.path.abspath(__file__))}/resources/init/python/black_config"
+    ) as file:
+        black_config = file.read()
+    shell.append_to_file(f"{path}/pyproject.toml", black_config)
+
+    logging.info(f"adding python specific config to .gitignore")
+    with open(
+        f"{os.path.dirname(os.path.abspath(__file__))}/resources/init/python/python_gitignore_config"
+    ) as file:
+        python_gitignore_config = file.read()
+    shell.append_to_file(f"{path}/.gitignore", python_gitignore_config)
+
+    logging.info(f"add flake8 config at `{path}`")
+    shell.copy_file(
+        source="init/python/flake8_config",
+        destination=f"{path}/.flake8",
+    )
+
+    logging.info(f"add pre-commit-config at `{path}`")
+    shell.copy_file(
+        source="init/python/pre_commit_config",
+        destination=f"{path}/.pre-commit-config",
+    )
+
+
+def construct_project_path(parent, name):
+    path = parent + "/" + name
+    path = os.path.expanduser(path)
+    return path

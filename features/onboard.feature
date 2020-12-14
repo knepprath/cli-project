@@ -15,7 +15,7 @@ Feature: Automate the onboarding workflow for new developers
     And git user profile is set with users name
     And git commit template is configured
 
-  Scenario: New Developer Tools Installation - pyenv
+  Scenario: New Developer Tools Installation - python
     When the user runs KlickBrick 'onboard --dev-tools pyenv --first-name Ole --last-name Christiansen'
     Then pyenv is installed
     And Python version 3.8.0 is set as Global default

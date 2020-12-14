@@ -149,6 +149,8 @@ class KlickBrick(object):
 
         args = parser.parse_args(arguments[1:])
 
+        scripts.init_generic(args.path, args.name)
+
         if "python" in args.framework:
             scripts.init_python(args.path, args.name)
         else:
