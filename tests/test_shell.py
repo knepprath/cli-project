@@ -34,6 +34,13 @@ class TestShell(unittest.TestCase):
         self.assertEqual(return_value_code, 0)
         self.assertTrue("Invoked using dry run" in return_value_stdout)
 
+    # TODO expand on test coverage
+    # def test_append_to_file_happy_path(self):
+    #     self.assertFalse()
+    #
+    # def test_create_directory_happy_path(self):
+    #     self.assertFalse()
+
 
 if __name__ == "__main__":
     unittest.main()

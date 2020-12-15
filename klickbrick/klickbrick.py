@@ -38,6 +38,18 @@ class KlickBrick(object):
 
         self.subparsers = parser.add_subparsers()
 
+        # handle no arguments
+        if len(arguments) == 0:
+            self.help(arguments)
+        else:
+            command = arguments[0]
+            # handle undefined command
+            if not hasattr(self, command):
+                self.help(arguments)
+            else:
+                # use dispatch pattern to invoke method with same name so it's easy to add new subcommands
+                getattr(self, command)(arguments)
+
         # TODO config to enable metrics
         # send_metric(
         #     {
@@ -53,18 +65,6 @@ class KlickBrick(object):
         #         },
         #     }
         # )
-
-        # handle no arguments
-        if len(arguments) == 0:
-            self.help(arguments)
-        else:
-            command = arguments[0]
-            # handle undefined command
-            if not hasattr(self, command):
-                self.help(arguments)
-            else:
-                # use dispatch pattern to invoke method with same name so it's easy to add new subcommands
-                getattr(self, command)(arguments)
 
     # Design Decision Tradeoff
     # Optimizing for being easy to add new commands but with robust help functionality.
