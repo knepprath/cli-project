@@ -10,12 +10,9 @@ def step_impl(context):
     Path(path).mkdir(parents=True)
 
 
-@then("an error message is displayed stating the directory already exits")
+@then("an error message is displayed stating the directory already exists")
 def step_impl(context):
-    assert (
-        "Cannot create project. The directory already exits"
-        in context.response
-    )
+    assert "The directory already exists" in context.response
 
 
 @then(
