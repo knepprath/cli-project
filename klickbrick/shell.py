@@ -1,8 +1,6 @@
 import subprocess
-from pathlib import Path
 import shutil
 import os
-import urllib.request
 import logging
 
 from klickbrick import config
@@ -32,35 +30,31 @@ def execute(args):
 
 
 def copy_file(source, destination):
+    command = f"cp {source} {destination}"
     logging.debug(f"copying {source} to {destination}")
     if config.DRY_RUN:
-        print(f"cp {source} {destination}")
-        return 0
+        print(command)
+        return True
     else:
-        shutil.copyfile(
-            f"{os.path.dirname(os.path.abspath(__file__))}/resources/{source}",
-            destination,
-        )
+        return_code, output = execute(command)
+        if return_code == 0:
+            return True
+        else:
+            return False
 
 
 def install_from_url(executor, url, args=""):
+    command = f'{executor} -c "$(curl -fsSL {url})" {args}'
     logging.debug(f"downloading from {url} and executing with {executor}")
     if config.DRY_RUN:
-        print(f'{executor} -c "$(curl -fsSL {url})" {args}')
+        print(command)
         return 0
     else:
-        filename = download_from_url(url)
-        execute(f"{executor} {filename} {args}")
-
-
-def download_from_url(url):
-    logging.debug(f"Downloading installer from {url}")
-    filename, headers = urllib.request.urlretrieve(url)
-    logging.debug(f"Downloaded {filename} with headers {headers}")
-    return filename
+        execute(command)
 
 
 def create_directory(path):
+    command = f"mkdir -p {path}"
     logging.debug(f"creating the directory {path}")
 
     if os.path.isdir(path):
@@ -68,19 +62,17 @@ def create_directory(path):
         return False
     else:
         if config.DRY_RUN:
-            print(f"mkdir -p {path}")
+            print(command)
         else:
-            Path(path).mkdir(parents=True)
+            execute(command)
         return True
 
 
 def append_to_file(path, content):
+    command = f"echo '\n{content}\n' >> {path}"
     logging.debug(f"append to {path} the following content: {content}")
     if config.DRY_RUN:
-        print(f"echo {content} >> {path}")
+        print(command)
         return 0
     else:
-        with open(path, "a") as file:
-            file.write("\n")
-            file.write(content)
-            file.write("\n")
+        execute(command)

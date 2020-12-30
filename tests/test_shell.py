@@ -73,6 +73,32 @@ class TestShell(unittest.TestCase):
         return_value = shell.create_directory(TEST_DIRECTORY)
         self.assertFalse(return_value)
 
+    def test_copy_file_happy_path(self):
+        test_file_source_path = f"{TEST_DIRECTORY}/source_file"
+        test_file_destination_path = f"{TEST_DIRECTORY}/destination_file"
+        test_file_contents = "some pre-existing text"
+
+        with open(test_file_source_path, "w") as file:
+            file.write(test_file_contents)
+
+        return_code = shell.copy_file(
+            test_file_source_path, test_file_destination_path
+        )
+        self.assertTrue((os.path.isfile(test_file_destination_path)))
+        with open(test_file_destination_path, "r") as file:
+            contents = file.read()
+        self.assertTrue(test_file_contents in contents)
+        self.assertTrue(return_code)
+
+    def test_copy_file_source_file_does_not_exist(self):
+        test_file_source_path = f"{TEST_DIRECTORY}/source_file"
+        test_file_destination_path = f"{TEST_DIRECTORY}/destination_file"
+
+        return_code = shell.copy_file(
+            test_file_source_path, test_file_destination_path
+        )
+        self.assertFalse(return_code)
+
 
 if __name__ == "__main__":
     unittest.main()

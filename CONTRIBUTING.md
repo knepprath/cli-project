@@ -10,7 +10,7 @@ poetry install
 
 To run locally:
 ```
-poety run klickbrick help
+poetry run klickbrick help
 ```
 
 ## Testing

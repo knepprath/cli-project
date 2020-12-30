@@ -194,10 +194,8 @@ class KlickBrick(object):
         # TODO refactor to be more maintainable
         elif args.first_name is not None and args.last_name is not None:
             if args.it_request is True:
-                logging.info("submitting it request")
                 scripts.send_it_email(args.first_name, args.last_name)
             elif args.dev_tools is not False:
-                logging.info("installing dev tools")
                 scripts.install_dev_tools(
                     args.dev_tools, args.first_name, args.last_name
                 )
