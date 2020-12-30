@@ -14,7 +14,6 @@ class TestShell(unittest.TestCase):
     def setUp(self):
         config.initialize()
         self.held, sys.stdout = sys.stdout, StringIO()
-        self.held, sys.stderr = sys.stderr, StringIO()
         os.makedirs(TEST_DIRECTORY, exist_ok=True)
 
     def tearDown(self):
@@ -72,8 +71,6 @@ class TestShell(unittest.TestCase):
 
     def test_create_directory_logs_error_if_already_exists(self):
         return_value = shell.create_directory(TEST_DIRECTORY)
-        stdout_output = sys.stderr.getvalue()
-        self.assertTrue("The directory already exists" in stdout_output)
         self.assertFalse(return_value)
 
 
