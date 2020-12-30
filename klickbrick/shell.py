@@ -49,25 +49,29 @@ def install_from_url(executor, url, args=""):
         print(f'{executor} -c "$(curl -fsSL {url})" {args}')
         return 0
     else:
-        logging.debug(f"Downloading installer from {url}")
-        filename, headers = urllib.request.urlretrieve(url)
-        logging.debug(f"Downloaded {filename} with headers {headers}")
+        filename = download_from_url(url)
         execute(f"{executor} {filename} {args}")
+
+
+def download_from_url(url):
+    logging.debug(f"Downloading installer from {url}")
+    filename, headers = urllib.request.urlretrieve(url)
+    logging.debug(f"Downloaded {filename} with headers {headers}")
+    return filename
 
 
 def create_directory(path):
     logging.debug(f"creating the directory {path}")
 
     if os.path.isdir(path):
-        logging.error(
-            f"Cannot create project. The directory already exits: {path}"
-        )
+        logging.error(f"The directory already exists: {path}")
+        return False
     else:
         if config.DRY_RUN:
             print(f"mkdir -p {path}")
-            return 0
         else:
             Path(path).mkdir(parents=True)
+        return True
 
 
 def append_to_file(path, content):
@@ -77,4 +81,6 @@ def append_to_file(path, content):
         return 0
     else:
         with open(path, "a") as file:
+            file.write("\n")
             file.write(content)
+            file.write("\n")
