@@ -13,6 +13,13 @@ To run locally:
 poetry run klickbrick help
 ```
 
+To run backend server for collecting telemetry:
+```
+python ./server/app.py
+```
+This will allow you to observe events emitted by the CLI
+
+
 ## Testing
 Use Make to run tests
 
