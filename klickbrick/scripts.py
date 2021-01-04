@@ -198,3 +198,7 @@ def construct_project_path(parent, name):
     path = parent + "/" + name
     path = os.path.expanduser(path)
     return path
+
+
+def get_username():
+    return shell.execute("whoami")

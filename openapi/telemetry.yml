@@ -76,3 +76,6 @@ components:
         duration:
           type: string
           example: 0m0.001s
+        timestamp:
+          type: string
+          example: 01/03/2021, 16:26:54

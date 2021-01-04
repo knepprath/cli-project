@@ -3,14 +3,19 @@ import sys
 import os
 import inspect
 import logging
+import platform
+from datetime import datetime
 
 import requests
 
 from klickbrick import config
 from klickbrick import scripts
 
-# TODO Make log level configurable
+# TODO Make log level user configurable
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
+# TODO make telemetry user configurable
+ENABLE_TELEMETRY = True
 
 
 class KlickBrick(object):
@@ -50,21 +55,8 @@ class KlickBrick(object):
                 # use dispatch pattern to invoke method with same name so it's easy to add new subcommands
                 getattr(self, command)(arguments)
 
-        # TODO config to enable metrics
-        # send_metric(
-        #     {
-        #         "userId": "DK",
-        #         "osPlatform": "mac os x",
-        #         "osVersion": "10.15.6",
-        #         "pythonVersion": "3.8.9",
-        #         "command": {
-        #             "input": " ".join(arguments[1:]),
-        #             "exitReason": "blah",
-        #             "exitCode": "0",
-        #             "duration": "0m0.001s",
-        #         },
-        #     }
-        # )
+        if ENABLE_TELEMETRY:
+            send_metric(arguments)
 
     # Design Decision Tradeoff
     # Optimizing for being easy to add new commands but with robust help functionality.
@@ -220,15 +212,32 @@ class KlickBrick(object):
         return parser
 
 
-def send_metric(metric):
-    payload = {"metrics": [metric]}
+def send_metric(cli_input):
+    # TODO capture exit reason and duration
+    payload = {
+        "metrics": [
+            {
+                "userId": os.getlogin(),
+                "osPlatform": platform.system(),
+                "osVersion": platform.version(),
+                "pythonVersion": sys.version,
+                "command": {
+                    "input": " ".join(cli_input),
+                    "exitReason": "Not Implemented",
+                    "exitCode": "Not Implemented",
+                    "duration": "Not Implemented",
+                    "timestamp": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+                },
+            }
+        ]
+    }
 
     try:
         requests.post(
             "http://localhost:8080/metrics", json=payload, timeout=2000
         )
-    except requests.exceptions.Timeout as ex:
-        logging.error(str(ex))
+    except requests.exceptions.RequestException as exception:
+        logging.debug(str(exception))
 
 
 def print_available_commands(cli):
