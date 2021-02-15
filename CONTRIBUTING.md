@@ -1,4 +1,10 @@
-# Contributing to klickbrick CLI 
+# Contributing to klickbrick CLI
+
+## Prerequisites
+To work on this project your development environment should have the following prerequisites install:
+
+- Python 3.7+ should be executable in your shell's path environment.
+- Install Poetry using the instructions specified in the [documentation](https://python-poetry.org/docs/#installation).
 
 ## Development
 This project uses Poetry for dependency management and packaging.
