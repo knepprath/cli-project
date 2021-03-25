@@ -12,6 +12,7 @@ The initial iteration of the CLI has been designed for developers on macOS, but 
 The CLI requires Python3. It is currently distributed on the TestPyPI repository and can be installed with the
  following command: 
  ```
+pip install --upgrade pip
 pip install -i https://test.pypi.org/simple/ klickbrick
  ```
 
