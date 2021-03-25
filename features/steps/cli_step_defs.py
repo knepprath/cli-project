@@ -33,11 +33,9 @@ def step_impl(context, command):
 
 @when("the user runs KlickBrick without any arguments")
 def step_impl(context):
-    context.execute_steps(
-        """
-        When the user runs KlickBrick ' '
-    """
-    )
+    response_code, output = execute(f"poetry run klickbrick")
+    print(output)
+    context.response = output
 
 
 @then("the current version of the CLI is identified")
@@ -47,4 +45,9 @@ def step_impl(context):
 
 @then("the command is identified as invalid")
 def step_impl(context):
-    assert "'nonexistent' is not a valid command" "" in context.response
+    assert "klickbrick: error: invalid choice:" in context.response
+
+
+@then("document KlickBrick usage")
+def step_impl(context):
+    assert "usage: klickbrick [-h] [-v]" in context.response

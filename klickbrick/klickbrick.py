@@ -1,7 +1,6 @@
 import argparse
 import sys
 import os
-import inspect
 import logging
 import platform
 from datetime import datetime
@@ -20,111 +19,58 @@ ENABLE_TELEMETRY = True
 
 class KlickBrick(object):
     def __init__(self, arguments):
-        parser = argparse.ArgumentParser(prog="klickbrick")
-        # Create base subparser so parsers can consume it as parent and share common arguments
-        self.base_subparser = argparse.ArgumentParser(add_help=False)
-        self.base_subparser.add_argument(
+        self.parser = argparse.ArgumentParser(prog="klickbrick")
+        self.parser.add_argument(
             "-v",
             "--version",
             action="version",
             version=f"%(prog)s {scripts.package_version()}",
         )
-        self.base_subparser.add_argument(
+        # Create base subparser so parsers can consume it as parent and share common arguments
+        base_subparser = argparse.ArgumentParser(add_help=False)
+        base_subparser.add_argument(
             "-d",
             "--dry-run",
             action="store_true",
             help="Inspect what the result of the command will be without any side effects",
         )
 
-        args, unknown = self.base_subparser.parse_known_args(arguments)
-        if args.dry_run is True:
-            logging.debug("Enabling dry run mode")
-            config.DRY_RUN = True
-
-        self.subparsers = parser.add_subparsers()
-
-        # handle no arguments
-        if len(arguments) == 0:
-            self.help(arguments)
-        else:
-            command = arguments[0]
-            # handle undefined command
-            if not hasattr(self, command):
-                self.help(arguments)
-            else:
-                # use dispatch pattern to invoke method with same name so it's easy to add new subcommands
-                getattr(self, command)(arguments)
-
-        if ENABLE_TELEMETRY:
-            send_metric(arguments)
-
-    # Design Decision Tradeoff
-    # Optimizing for being easy to add new commands but with robust help functionality.
-    # Augmenting the default help adds one time complexity, but all new commands will benefit.
-    def help(self, arguments):
-        parser = self.__create_parser(
-            "help", "Instructions for using the klickbrick CLI"
-        )
-        parser.add_argument("help", nargs="?", help=argparse.SUPPRESS)
-        parser.add_argument(
-            "command",
-            nargs="?",
-            help="name of command to show usage for",
+        self.subparsers = self.parser.add_subparsers()
+        self.subparsers.add_parser(
+            name="help",
+            parents=[base_subparser],
+            description="Document usage of the CLI",
         )
 
-        # Handle unknown arguments
-        args, unknown = parser.parse_known_args(arguments)
-
-        if args.help is None and args.command is None:
-            print_available_commands(self)
-        elif unknown:
-            logging.error(f"'{unknown}' is not a valid argument")
-            parser.print_help()
-            print_available_commands(self)
-        elif args.help == "help" and args.command is None:
-            parser.print_help()
-            print_available_commands(self)
-        elif "help" not in args.help:
-            logging.error(f"'{args.help}' is not a valid command")
-            print_available_commands(self)
-        elif not hasattr(self, args.command):
-            logging.error(f"'{args.command}' is not a valid argument")
-            print_available_commands(self)
-        else:
-            arguments.append("-h")
-            try:
-                getattr(self, args.command)(arguments)
-            # TODO Because I am augmenting the built in help I don't want argparse to do system exit as this breaks ability to test
-            # Consider a better solution https://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overriding-the-exit-status-code
-            except SystemExit:
-                pass
-
-    def hello(self, arguments):
-        parser = self.__create_parser("hello", "A friendly Hello World")
-        parser.add_argument(
+        hello_parser = self.subparsers.add_parser(
+            name="hello",
+            parents=[base_subparser],
+            description="A friendly Hello World",
+        )
+        hello_parser.add_argument(
             "-n",
             "--name",
             type=str,
-            default="world",
+            default="World",
             help="Optional flag to be more friendly",
         )
-        args = parser.parse_args(arguments[1:])
-        print(scripts.construct_greeting(args.name))
 
-    def init(self, arguments):
-        parser = self.__create_parser(
-            "init",
-            "Initialize a new code repository with standard conventions",
+        init_parser = self.subparsers.add_parser(
+            name="init",
+            parents=[base_subparser],
+            description="Initialize a new code repository with standard conventions",
         )
-        parser.add_argument(
+        init_parser.add_argument(
             "-p",
             "--path",
             type=str,
             default=os.getcwd(),
             help="Path to location that the code repository should be created. Defaults to the current working directory",
         )
-        required_arguments = parser.add_argument_group("required arguments")
-        required_arguments.add_argument(
+        init_required_arguments = init_parser.add_argument_group(
+            "required arguments"
+        )
+        init_required_arguments.add_argument(
             "-n",
             "--name",
             type=str,
@@ -132,16 +78,12 @@ class KlickBrick(object):
             help="Name of the new code repository",
         )
 
-        args = parser.parse_args(arguments[1:])
-
-        scripts.init_generic(args.path, args.name)
-
-    def onboard(self, arguments):
-        parser = self.__create_parser(
-            "onboard",
-            "Installs and configures all software needed by new developers",
+        onboard_parser = self.subparsers.add_parser(
+            name="onboard",
+            parents=[base_subparser],
+            description="Configures all software needed by new developers",
         )
-        parser.add_argument(
+        onboard_parser.add_argument(
             "--dev-tools",
             nargs="?",
             default=False,
@@ -149,33 +91,56 @@ class KlickBrick(object):
             help="[DEV_TOOLS] is optional argument to install and configure a single tool",
         )
 
-        required_arguments = parser.add_argument_group(
+        onboard_required_arguments = onboard_parser.add_argument_group(
             "required arguments for --dev-tools"
         )
-        required_arguments.add_argument("--first-name")
-        required_arguments.add_argument("--last-name")
+        onboard_required_arguments.add_argument("--first-name")
+        onboard_required_arguments.add_argument("--last-name")
 
-        args = parser.parse_args(arguments[1:])
+        # Handle no arguments
+        if len(arguments) == 0:
+            self.parser.print_help(sys.stderr)
+            sys.exit(1)
 
+        try:
+            options = self.parser.parse_args(arguments)
+        # Handle invalid arguments
+        except AttributeError:
+            self.parser.print_help()
+            sys.exit(0)
+
+        if options.dry_run is True:
+            logging.debug("Enabling dry run mode")
+            config.DRY_RUN = True
+
+        getattr(self, arguments[0])(options)
+
+        if ENABLE_TELEMETRY:
+            send_metric(arguments)
+
+    def hello(self, options):
+        print(scripts.construct_greeting(options.name))
+
+    def help(self, options):
+        self.parser.print_help()
+
+    def init(self, options):
+        scripts.init_generic(options.path, options.name)
+
+    def onboard(self, options):
         # TODO refactor to be more maintainable
-        if args.first_name is not None and args.last_name is not None:
-            if args.dev_tools is not False:
+        if options.first_name is not None and options.last_name is not None:
+            if options.dev_tools is not False:
                 scripts.config_dev_tools(
-                    args.dev_tools, args.first_name, args.last_name
+                    options.dev_tools, options.first_name, options.last_name
                 )
             else:
                 logging.info("Performing all onboarding tasks")
-                scripts.config_dev_tools(True, args.first_name, args.last_name)
+                scripts.config_dev_tools(
+                    True, options.first_name, options.last_name
+                )
         else:
             logging.error("missing required args")
-
-    def __create_parser(self, name, description):
-        parser = self.subparsers.add_parser(
-            name=name,
-            parents=[self.base_subparser],
-            description=description,
-        )
-        return parser
 
 
 def send_metric(cli_input):
@@ -204,13 +169,6 @@ def send_metric(cli_input):
         )
     except requests.exceptions.RequestException as exception:
         logging.debug(str(exception))
-
-
-def print_available_commands(cli):
-    print("List of available commands are:")
-    print(
-        [attr for attr in dir(cli) if inspect.ismethod(getattr(cli, attr))][1:]
-    )
 
 
 # Entry point for poetry so package is executable

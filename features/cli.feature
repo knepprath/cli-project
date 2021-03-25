@@ -14,7 +14,7 @@ Feature: Core Functionality of the CLI
 
   Scenario: Executed with no arguments
     When the user runs KlickBrick without any arguments
-    Then list all available commands
+    Then document KlickBrick usage
 
   Scenario: Executed with non-existent subcommand
     When the user runs KlickBrick 'nonexistent'

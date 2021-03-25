@@ -1,15 +1,13 @@
 from behave import *
 
-from klickbrick.shell import execute
 
-
-@given("we run the hello command")
+@then('the command returns "Hello World"')
 def step_impl(context):
-    response_code, output = execute("poetry run klickbrick hello --name Ole")
-    context.response = output
+    print(context.response)
+    assert "Hello World" in context.response
 
 
-@then('the command returns "hello world"')
+@then('the command returns "Hello Ole"')
 def step_impl(context):
     print(context.response)
     assert "Hello Ole" in context.response

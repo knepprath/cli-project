@@ -1,5 +1,9 @@
 Feature: showing off behave
 
-  Scenario: run hello command
-     Given we run the hello command
-     Then the command returns "hello world"
+  Scenario: Hello World
+    When the user runs KlickBrick 'hello'
+    Then the command returns "Hello World"
+
+  Scenario: Friendly Hello
+    When the user runs KlickBrick 'hello --name Ole'
+    Then the command returns "Hello Ole"
