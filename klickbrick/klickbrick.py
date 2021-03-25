@@ -123,13 +123,6 @@ class KlickBrick(object):
             default=os.getcwd(),
             help="Path to location that the code repository should be created. Defaults to the current working directory",
         )
-        parser.add_argument(
-            "-f",
-            "--framework",
-            type=str,
-            default="python",
-            help="Language framework that this code repository will use",
-        )
         required_arguments = parser.add_argument_group("required arguments")
         required_arguments.add_argument(
             "-n",
@@ -143,25 +136,10 @@ class KlickBrick(object):
 
         scripts.init_generic(args.path, args.name)
 
-        if "python" in args.framework:
-            scripts.init_python(args.path, args.name)
-        else:
-            logging.warning(f"Python is currently the only supported language")
-
     def onboard(self, arguments):
         parser = self.__create_parser(
             "onboard",
             "Installs and configures all software needed by new developers",
-        )
-        parser.add_argument(
-            "--checklist",
-            action="store_true",
-            help="Generate a checklist for new developers to effectively complete onboarding process",
-        )
-        parser.add_argument(
-            "--it-request",
-            action="store_true",
-            help="Creates and email draft with for the IT department to complete onboarding process with custom information provided by new employee",
         )
         parser.add_argument(
             "--dev-tools",
@@ -172,34 +150,22 @@ class KlickBrick(object):
         )
 
         required_arguments = parser.add_argument_group(
-            "required arguments for --it-request and --dev-tools"
+            "required arguments for --dev-tools"
         )
         required_arguments.add_argument("--first-name")
         required_arguments.add_argument("--last-name")
 
         args = parser.parse_args(arguments[1:])
 
-        if args.checklist is True:
-            logging.info("creating checklist")
-            scripts.write_checklist()
-        # All other options require additional flags
         # TODO refactor to be more maintainable
-        elif args.first_name is not None and args.last_name is not None:
-            if args.it_request is True:
-                scripts.send_it_email(args.first_name, args.last_name)
-            elif args.dev_tools is not False:
-                scripts.install_dev_tools(
+        if args.first_name is not None and args.last_name is not None:
+            if args.dev_tools is not False:
+                scripts.config_dev_tools(
                     args.dev_tools, args.first_name, args.last_name
                 )
             else:
-                logging.info(
-                    "creating checklist, submitting it request, and installing dev tools"
-                )
-                scripts.write_checklist()
-                scripts.send_it_email(args.first_name, args.last_name)
-                scripts.install_dev_tools(
-                    True, args.first_name, args.last_name
-                )
+                logging.info("Performing all onboarding tasks")
+                scripts.config_dev_tools(True, args.first_name, args.last_name)
         else:
             logging.error("missing required args")
 

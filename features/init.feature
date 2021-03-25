@@ -20,12 +20,3 @@ Feature: Initialize a code repository for a new project
     Then there is a README template
     Then there is a .travis.yml template
     Then there is a features directory
-
-  Scenario: Initialize python project with standard config files
-    When the user runs KlickBrick 'init --name new-project --framework python'
-    Then the project is initialized with poetry
-    Then the python specific config is added to .gitignore
-    Then there is a black config in pyproject.toml
-    Then there is a .flake8 config file
-    Then there is a .pre-commit-config.yaml
-    Then there is a .python-version file

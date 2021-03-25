@@ -42,49 +42,10 @@ def step_impl(context):
     # assert os.path.isdir(path)
 
 
-@then("there is a black config in pyproject.toml")
-def step_impl(context):
-    assert (
-        f"( cd {os.getcwd()}/new-project ; pyenv local 3.8.0 )"
-        in context.response
-    )
-
-
-@then("there is a .flake8 config file")
-def step_impl(context):
-    assert (
-        f"cp init/python/flake8_config {os.getcwd()}/new-project/.flake8"
-        in context.response
-    )
-
-
-@then("there is a .pre-commit-config.yaml")
-def step_impl(context):
-    assert (
-        f"cp init/python/pre_commit_config {os.getcwd()}/new-project/.pre-commit-config"
-        in context.response
-    )
-
-
-@then("there is a .python-version file")
-def step_impl(context):
-    assert (
-        f"cd {os.getcwd()}/new-project ; pyenv local 3.8.0" in context.response
-    )
-
-
-@then("the project is initialized with poetry")
-def step_impl(context):
-    assert (
-        f"cd {os.getcwd()}/new-project ; poetry init --name new-project --python 3.8.0"
-        in context.response
-    )
-
-
 @then("there is a default .gitignore")
 def step_impl(context):
     assert (
-        f"cp init/gitignore_config {os.getcwd()}/new-project/.gitignore"
+        f"cp {os.getcwd()}/klickbrick/resources/init/gitignore_config {os.getcwd()}/new-project/.gitignore"
         in context.response
     )
 
@@ -97,7 +58,7 @@ def step_impl(context):
 @then("there is a .travis.yml template")
 def step_impl(context):
     assert (
-        f"cp init/travis_template {os.getcwd()}/new-project/.travis.yml"
+        f"cp {os.getcwd()}/klickbrick/resources/init/travis_template {os.getcwd()}/new-project/.travis.yml"
         in context.response
     )
 
@@ -108,8 +69,3 @@ def step_impl(context):
         f"mkdir -p {os.getcwd()}/new-project/features/steps"
         in context.response
     )
-
-
-@then("the python specific config is added to .gitignore")
-def step_impl(context):
-    assert f">> {os.getcwd()}/new-project/README" in context.response
