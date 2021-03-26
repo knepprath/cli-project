@@ -30,22 +30,6 @@ For unit tests:
 make test
 ```
 
-Integration test:
-```
-make integration
-```
-
-Behave Integration tests are implemented by invoking the CLI through the package installed in the Poetry virtual
- environment. 
- 
-Individual tests can be run by Feature:
-
-`behave -i cli.feature`
-
-Or individual scenarios:
-
-`behave -n 'Document Available Commands'`
-
 
 ## Publishing
 *NOTE:* This project is currently publishing to TestPyPI repository because the project is for educational purposes. 

@@ -4,8 +4,6 @@ python:
   - "3.7"
 cache:
   pip: true
-  directories:
-    - $HOME/.cache/pre-commit
 
 stages:
   - Quality
@@ -22,11 +20,6 @@ jobs:
     - stage: Quality
       name: tests
       script: make test
-    - stage: Quality
-      name: lint
-      script: make lint
-    - name: integration
-      script: make integration
     - stage: Publish
       script: skip
       before_deploy:
