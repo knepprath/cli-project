@@ -21,14 +21,6 @@ To run locally:
 poetry run klickbrick help
 ```
 
-To run backend server for collecting telemetry:
-```
-python ./server/app.py
-```
-This will allow you to observe events emitted by the CLI
-
-The OpenAPI spec can be viewed with a swagger editor, such as [https://editor.swagger.io](https://editor.swagger.io)
-
 ## Testing
 Use Make to run tests
 

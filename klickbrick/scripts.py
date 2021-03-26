@@ -46,35 +46,6 @@ def configure_git(first_name, last_name):
         logging.error("git commit.template was not configured")
 
 
-def init_generic(parent, name):
-    path = construct_project_path(parent, name)
-    logging.info(f"creating project at `{path}`")
-    shell.create_directory(path)
-
-    logging.info(f"add .gitignore config at `{path}`")
-    shell.copy_file(
-        source=f"{os.path.dirname(os.path.abspath(__file__))}/resources/init/gitignore_config",
-        destination=f"{path}/.gitignore",
-    )
-
-    logging.info(f"add README from template at `{path}`")
-    with open(
-        f"{os.path.dirname(os.path.abspath(__file__))}/resources/init/readme_template"
-    ) as file:
-        readme_content = file.read()
-    readme_content = readme_content.format(name)
-    shell.append_to_file(f"{path}/README", readme_content)
-
-    logging.info(f"add generic .travis.yml at `{path}`")
-    shell.copy_file(
-        source=f"{os.path.dirname(os.path.abspath(__file__))}/resources/init/travis_template",
-        destination=f"{path}/.travis.yml",
-    )
-
-    logging.info(f"creating a features directory for BDD process at `{path}`")
-    shell.create_directory(f"{path}/features/steps")
-
-
 def construct_project_path(parent, name):
     path = parent + "/" + name
     path = os.path.expanduser(path)

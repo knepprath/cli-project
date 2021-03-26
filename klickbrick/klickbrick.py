@@ -13,9 +13,6 @@ from klickbrick import scripts
 # TODO Make log level user configurable
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-# TODO make telemetry user configurable
-ENABLE_TELEMETRY = True
-
 
 class KlickBrick(object):
     def __init__(self, arguments):
@@ -41,7 +38,6 @@ class KlickBrick(object):
         self.add_hello_parser()
         self.add_onboard_parser()
         self.add_help_parser()
-        self.add_init_parser()
 
         # Handle no arguments
         if len(arguments) == 0:
@@ -61,9 +57,6 @@ class KlickBrick(object):
 
         # invoke command with options
         getattr(self, arguments[0])(options)
-
-        if ENABLE_TELEMETRY:
-            send_metric(arguments)
 
     def create_parser(self, name, description):
         return self.subparsers.add_parser(
@@ -106,38 +99,11 @@ class KlickBrick(object):
             "--last-name", type=str, required=True
         )
 
-    def add_init_parser(self):
-        init_parser = self.create_parser(
-            "init",
-            "Initialize a new code repository with standard conventions",
-        )
-
-        init_parser.add_argument(
-            "-p",
-            "--path",
-            type=str,
-            default=os.getcwd(),
-            help="Path to location that the code repository should be created. Defaults to the current working directory",
-        )
-        init_required_arguments = init_parser.add_argument_group(
-            "required arguments"
-        )
-        init_required_arguments.add_argument(
-            "-n",
-            "--name",
-            type=str,
-            required=True,
-            help="Name of the new code repository",
-        )
-
     def hello(self, options):
         print(scripts.construct_greeting(options.name))
 
     def help(self, options):
         self.parser.print_help()
-
-    def init(self, options):
-        scripts.init_generic(options.path, options.name)
 
     def onboard(self, options):
         if options.dev_tools is not False:
@@ -150,34 +116,6 @@ class KlickBrick(object):
                 True, options.first_name, options.last_name
             )
             # ...invoke scripts for additional onboarding tasks
-
-
-def send_metric(cli_input):
-    # TODO capture exit reason and duration
-    payload = {
-        "metrics": [
-            {
-                "userId": os.getlogin(),
-                "osPlatform": platform.system(),
-                "osVersion": platform.version(),
-                "pythonVersion": sys.version,
-                "command": {
-                    "input": " ".join(cli_input),
-                    "exitReason": "Not Implemented",
-                    "exitCode": "Not Implemented",
-                    "duration": "Not Implemented",
-                    "timestamp": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
-                },
-            }
-        ]
-    }
-
-    try:
-        requests.post(
-            "http://localhost:8080/metrics", json=payload, timeout=2000
-        )
-    except requests.exceptions.RequestException as exception:
-        logging.debug(str(exception))
 
 
 # Entry point for poetry so package is executable
