@@ -11,12 +11,3 @@ Feature: Core Functionality of the CLI
     | input       |
     | --version |
     | -v        |
-
-  Scenario: Executed with no arguments
-    When the user runs KlickBrick without any arguments
-    Then document KlickBrick usage
-
-  Scenario: Executed with non-existent subcommand
-    When the user runs KlickBrick 'nonexistent'
-    Then the command is identified as invalid
-    And list all available commands

@@ -1,17 +1,8 @@
 import argparse
 import sys
-import os
-import logging
-import platform
-from datetime import datetime
-
-import requests
 
 from klickbrick import config
 from klickbrick import scripts
-
-# TODO Make log level user configurable
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 class KlickBrick(object):
@@ -37,22 +28,10 @@ class KlickBrick(object):
 
         self.add_hello_parser()
         self.add_onboard_parser()
-        self.add_help_parser()
 
-        # Handle no arguments
-        if len(arguments) == 0:
-            self.parser.print_help(sys.stderr)
-            sys.exit(1)
-
-        try:
-            options = self.parser.parse_args(arguments)
-        # Handle invalid arguments
-        except AttributeError:
-            self.parser.print_help()
-            sys.exit(0)
+        options = self.parser.parse_args(arguments)
 
         if options.dry_run is True:
-            logging.debug("Enabling dry run mode")
             config.DRY_RUN = True
 
         # invoke command with options
@@ -72,9 +51,6 @@ class KlickBrick(object):
             default="World",
             help="Optional flag to be more friendly",
         )
-
-    def add_help_parser(self):
-        self.create_parser("help", "Document usage of the CLI")
 
     def add_onboard_parser(self):
         onboard_parser = self.create_parser(
@@ -102,16 +78,12 @@ class KlickBrick(object):
     def hello(self, options):
         print(scripts.construct_greeting(options.name))
 
-    def help(self, options):
-        self.parser.print_help()
-
     def onboard(self, options):
         if options.dev_tools is not False:
             scripts.config_dev_tools(
                 options.dev_tools, options.first_name, options.last_name
             )
         else:
-            logging.info("Performing all onboarding tasks")
             scripts.config_dev_tools(
                 True, options.first_name, options.last_name
             )
