@@ -27,8 +27,9 @@ class KlickBrick(object):
             version=f"%(prog)s {scripts.package_version()}",
         )
         # Create base subparser so parsers can consume it as parent and share common arguments
-        base_subparser = argparse.ArgumentParser(add_help=False)
-        base_subparser.add_argument(
+        # This allows all commands to inherit the --dry-run flag as if it's their own argument
+        self.base_subparser = argparse.ArgumentParser(add_help=False)
+        self.base_subparser.add_argument(
             "-d",
             "--dry-run",
             action="store_true",
@@ -36,17 +37,41 @@ class KlickBrick(object):
         )
 
         self.subparsers = self.parser.add_subparsers()
-        self.subparsers.add_parser(
-            name="help",
-            parents=[base_subparser],
-            description="Document usage of the CLI",
+
+        self.add_hello_parser()
+        self.add_onboard_parser()
+        self.add_help_parser()
+        self.add_init_parser()
+
+        # Handle no arguments
+        if len(arguments) == 0:
+            self.parser.print_help(sys.stderr)
+            sys.exit(1)
+
+        try:
+            options = self.parser.parse_args(arguments)
+        # Handle invalid arguments
+        except AttributeError:
+            self.parser.print_help()
+            sys.exit(0)
+
+        if options.dry_run is True:
+            logging.debug("Enabling dry run mode")
+            config.DRY_RUN = True
+
+        # invoke command with options
+        getattr(self, arguments[0])(options)
+
+        if ENABLE_TELEMETRY:
+            send_metric(arguments)
+
+    def create_parser(self, name, description):
+        return self.subparsers.add_parser(
+            name=name, parents=[self.base_subparser], description=description
         )
 
-        hello_parser = self.subparsers.add_parser(
-            name="hello",
-            parents=[base_subparser],
-            description="A friendly Hello World",
-        )
+    def add_hello_parser(self):
+        hello_parser = self.create_parser("hello", "A friendly Hello World")
         hello_parser.add_argument(
             "-n",
             "--name",
@@ -55,11 +80,38 @@ class KlickBrick(object):
             help="Optional flag to be more friendly",
         )
 
-        init_parser = self.subparsers.add_parser(
-            name="init",
-            parents=[base_subparser],
-            description="Initialize a new code repository with standard conventions",
+    def add_help_parser(self):
+        self.create_parser("help", "Document usage of the CLI")
+
+    def add_onboard_parser(self):
+        onboard_parser = self.create_parser(
+            "onboard", "Configures all software needed by new developers"
         )
+        onboard_parser.add_argument(
+            "--dev-tools",
+            nargs="?",
+            choices=["git"],
+            default=False,
+            const=True,
+            help="[DEV_TOOLS] is optional argument to install and configure a single tool",
+        )
+
+        onboard_required_arguments = onboard_parser.add_argument_group(
+            "required arguments for --dev-tools"
+        )
+        onboard_required_arguments.add_argument(
+            "--first-name", type=str, required=True
+        )
+        onboard_required_arguments.add_argument(
+            "--last-name", type=str, required=True
+        )
+
+    def add_init_parser(self):
+        init_parser = self.create_parser(
+            "init",
+            "Initialize a new code repository with standard conventions",
+        )
+
         init_parser.add_argument(
             "-p",
             "--path",
@@ -78,46 +130,6 @@ class KlickBrick(object):
             help="Name of the new code repository",
         )
 
-        onboard_parser = self.subparsers.add_parser(
-            name="onboard",
-            parents=[base_subparser],
-            description="Configures all software needed by new developers",
-        )
-        onboard_parser.add_argument(
-            "--dev-tools",
-            nargs="?",
-            default=False,
-            const=True,
-            help="[DEV_TOOLS] is optional argument to install and configure a single tool",
-        )
-
-        onboard_required_arguments = onboard_parser.add_argument_group(
-            "required arguments for --dev-tools"
-        )
-        onboard_required_arguments.add_argument("--first-name")
-        onboard_required_arguments.add_argument("--last-name")
-
-        # Handle no arguments
-        if len(arguments) == 0:
-            self.parser.print_help(sys.stderr)
-            sys.exit(1)
-
-        try:
-            options = self.parser.parse_args(arguments)
-        # Handle invalid arguments
-        except AttributeError:
-            self.parser.print_help()
-            sys.exit(0)
-
-        if options.dry_run is True:
-            logging.debug("Enabling dry run mode")
-            config.DRY_RUN = True
-
-        getattr(self, arguments[0])(options)
-
-        if ENABLE_TELEMETRY:
-            send_metric(arguments)
-
     def hello(self, options):
         print(scripts.construct_greeting(options.name))
 
@@ -128,19 +140,16 @@ class KlickBrick(object):
         scripts.init_generic(options.path, options.name)
 
     def onboard(self, options):
-        # TODO refactor to be more maintainable
-        if options.first_name is not None and options.last_name is not None:
-            if options.dev_tools is not False:
-                scripts.config_dev_tools(
-                    options.dev_tools, options.first_name, options.last_name
-                )
-            else:
-                logging.info("Performing all onboarding tasks")
-                scripts.config_dev_tools(
-                    True, options.first_name, options.last_name
-                )
+        if options.dev_tools is not False:
+            scripts.config_dev_tools(
+                options.dev_tools, options.first_name, options.last_name
+            )
         else:
-            logging.error("missing required args")
+            logging.info("Performing all onboarding tasks")
+            scripts.config_dev_tools(
+                True, options.first_name, options.last_name
+            )
+            # ...invoke scripts for additional onboarding tasks
 
 
 def send_metric(cli_input):
